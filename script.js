@@ -232,6 +232,15 @@ function normalizeRepoName(name = '') {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
+function getGithubCols() {
+  const w = window.innerWidth;
+  if (w >= 1700) return 5;
+  if (w >= 1280) return 4;
+  if (w >= 980) return 3;
+  if (w >= 640) return 2;
+  return 1;
+}
+
 async function loadGitHubData() {
   try {
     const userRes = await fetch('https://api.github.com/users/chaman2003');
@@ -246,6 +255,11 @@ async function loadGitHubData() {
 
     if (!Array.isArray(repos) || !ghCardsEl) return;
 
+    const ghCols = getGithubCols();
+    const targetCards = ghCols * 2;
+    document.body.classList.add('gh-packed');
+    document.body.style.setProperty('--gh-cols', String(ghCols));
+
     const curatedRepos = repos
       .filter((repo) => {
         const hasDescription = Boolean(repo.description && repo.description.trim());
@@ -253,7 +267,7 @@ async function loadGitHubData() {
         const notInFeatured = !featuredRepoNames.has(normalizedName);
         return hasDescription && notInFeatured;
       })
-      .slice(0, 8);
+      .slice(0, targetCards);
 
     if (!curatedRepos.length) {
       ghCardsEl.innerHTML = '<p class="muted">No additional described repositories to show right now.</p>';
@@ -290,6 +304,12 @@ async function loadGitHubData() {
   }
 }
 loadGitHubData();
+
+let githubReloadTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(githubReloadTimer);
+  githubReloadTimer = setTimeout(loadGitHubData, 180);
+});
 
 // GSAP premium animations
 if (window.gsap && window.ScrollTrigger) {
