@@ -1,3 +1,4 @@
+export function initPortfolioEffects() {
 const yearEl = document.getElementById('year');
 const typewriterEl = document.getElementById('typewriter');
 const ghCardsEl = document.getElementById('githubCards');
@@ -1212,4 +1213,6 @@ if (canvas && ctx) {
     syncStarCount();
     seedStars();
   });
+}
+
 }
