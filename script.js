@@ -68,7 +68,7 @@ if ('IntersectionObserver' in window) {
 }
 
 // Intelligent terminal commands (Groq + local RAG)
-const GROQ_API_KEY = 'REPLACE_WITH_GROQ_API_KEY';
+const GROQ_API_KEY = localStorage.getItem('vrik_groq_key') || 'REPLACE_WITH_GROQ_API_KEY';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 const resumeRagChunks = [
@@ -148,7 +148,7 @@ function retrieveRagContext(query, topK = 6) {
 
 async function callGroqWithRag(query, { short = false } = {}) {
   if (!GROQ_API_KEY || GROQ_API_KEY === 'REPLACE_WITH_GROQ_API_KEY') {
-    throw new Error('Groq API key missing in project config.');
+    throw new Error('Groq API key missing. Set localStorage key "vrik_groq_key" and retry.');
   }
 
   const context = retrieveRagContext(query);
