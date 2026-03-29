@@ -5,6 +5,7 @@ const ghHeadlineEl = document.getElementById('ghHeadline');
 const scrollProgressEl = document.getElementById('scrollProgress');
 const heroSceneEl = document.getElementById('heroScene');
 const themeToggleBtn = document.getElementById('themeToggle');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -114,53 +115,64 @@ runTypewriter();
 
 // Cursor glow follow
 const cursorGlow = document.getElementById('cursorGlow');
-window.addEventListener('mousemove', (e) => {
-  if (!cursorGlow) return;
-  cursorGlow.style.left = `${e.clientX - 160}px`;
-  cursorGlow.style.top = `${e.clientY - 160}px`;
-});
+const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+if (hasFinePointer && !prefersReducedMotion) {
+  window.addEventListener('mousemove', (e) => {
+    if (!cursorGlow) return;
+    cursorGlow.style.left = `${e.clientX - 130}px`;
+    cursorGlow.style.top = `${e.clientY - 130}px`;
+  });
+} else if (cursorGlow) {
+  cursorGlow.style.display = 'none';
+}
 
-// Hero parallax
-window.addEventListener('mousemove', (e) => {
-  if (!heroSceneEl || window.innerWidth < 900) return;
-  const x = (e.clientX / window.innerWidth - 0.5) * 8;
-  const y = (e.clientY / window.innerHeight - 0.5) * 8;
-  heroSceneEl.style.transform = `perspective(1000px) rotateY(${x * 0.4}deg) rotateX(${-y * 0.35}deg)`;
-});
-window.addEventListener('mouseleave', () => {
-  if (!heroSceneEl) return;
-  heroSceneEl.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
-});
+// Hero parallax (subtle)
+if (!prefersReducedMotion) {
+  window.addEventListener('mousemove', (e) => {
+    if (!heroSceneEl || window.innerWidth < 900) return;
+    const x = (e.clientX / window.innerWidth - 0.5) * 5;
+    const y = (e.clientY / window.innerHeight - 0.5) * 5;
+    heroSceneEl.style.transform = `perspective(1000px) rotateY(${x * 0.25}deg) rotateX(${-y * 0.22}deg)`;
+  });
+  window.addEventListener('mouseleave', () => {
+    if (!heroSceneEl) return;
+    heroSceneEl.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+  });
+}
 
-// 3D tilt cards
+// 3D tilt cards (subtle)
 const tiltCards = document.querySelectorAll('.tilt');
-tiltCards.forEach((card) => {
-  card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const rotateY = ((x / rect.width) - 0.5) * 8;
-    const rotateX = (0.5 - y / rect.height) * 8;
-    card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+if (!prefersReducedMotion) {
+  tiltCards.forEach((card) => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const rotateY = ((x / rect.width) - 0.5) * 5;
+      const rotateX = (0.5 - y / rect.height) * 5;
+      card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg)';
+    });
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg)';
-  });
-});
+}
 
-// Magnetic buttons
+// Magnetic buttons (very subtle)
 const magneticButtons = document.querySelectorAll('.magnetic');
-magneticButtons.forEach((btn) => {
-  btn.addEventListener('mousemove', (e) => {
-    const rect = btn.getBoundingClientRect();
-    const x = e.clientX - (rect.left + rect.width / 2);
-    const y = e.clientY - (rect.top + rect.height / 2);
-    btn.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
+if (!prefersReducedMotion) {
+  magneticButtons.forEach((btn) => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - (rect.left + rect.width / 2);
+      const y = e.clientY - (rect.top + rect.height / 2);
+      btn.style.transform = `translate(${x * 0.07}px, ${y * 0.07}px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate(0, 0)';
+    });
   });
-  btn.addEventListener('mouseleave', () => {
-    btn.style.transform = 'translate(0, 0)';
-  });
-});
+}
 
 // Command deck modal
 const deckEl = document.getElementById('commandDeck');
@@ -308,7 +320,7 @@ const ctx = canvas?.getContext('2d');
 
 if (canvas && ctx) {
   const stars = [];
-  const starCount = 160;
+  const starCount = prefersReducedMotion ? 45 : 95;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -321,9 +333,9 @@ if (canvas && ctx) {
       stars.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        r: Math.random() * 1.6 + 0.2,
-        speed: Math.random() * 0.3 + 0.09,
-        alpha: Math.random() * 0.6 + 0.25
+        r: Math.random() * 1.3 + 0.2,
+        speed: Math.random() * 0.18 + 0.05,
+        alpha: Math.random() * 0.45 + 0.2
       });
     }
   }
