@@ -5,6 +5,7 @@ const ghHeadlineEl = document.getElementById('ghHeadline');
 const scrollProgressEl = document.getElementById('scrollProgress');
 const heroSceneEl = document.getElementById('heroScene');
 const themeToggleBtn = document.getElementById('themeToggle');
+const logoMarqueeEl = document.getElementById('logoMarquee');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -267,7 +268,7 @@ window.addEventListener('resize', () => {
 });
 
 // GSAP premium animations
-if (window.gsap && window.ScrollTrigger) {
+if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
   gsap.registerPlugin(ScrollTrigger);
 
   gsap.from('.header', {
@@ -292,7 +293,25 @@ if (window.gsap && window.ScrollTrigger) {
     ease: 'power3.out'
   });
 
-  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel').forEach((el) => {
+  gsap.from('.emoji-burst span', {
+    scale: 0,
+    opacity: 0,
+    rotate: -30,
+    duration: 0.5,
+    stagger: 0.07,
+    ease: 'back.out(2)'
+  });
+
+  gsap.to('.logo-pill', {
+    y: -4,
+    duration: 1.6,
+    ease: 'sine.inOut',
+    repeat: -1,
+    yoyo: true,
+    stagger: 0.12
+  });
+
+  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card').forEach((el) => {
     gsap.from(el, {
       y: 26,
       opacity: 0,
@@ -307,11 +326,12 @@ if (window.gsap && window.ScrollTrigger) {
   });
 }
 
-// keep ticker smooth if user switches tab/visibility
+// keep marquees smooth if user switches tab/visibility
 const tickerTrack = document.getElementById('tickerTrack');
 document.addEventListener('visibilitychange', () => {
-  if (!tickerTrack) return;
-  tickerTrack.style.animationPlayState = document.hidden ? 'paused' : 'running';
+  const playState = document.hidden ? 'paused' : 'running';
+  if (tickerTrack) tickerTrack.style.animationPlayState = playState;
+  if (logoMarqueeEl) logoMarqueeEl.style.animationPlayState = playState;
 });
 
 // Starfield background
