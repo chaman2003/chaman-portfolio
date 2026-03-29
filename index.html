@@ -32,13 +32,14 @@
     <div class="aurora aurora-a" aria-hidden="true"></div>
     <div class="aurora aurora-b" aria-hidden="true"></div>
     <div class="noise" aria-hidden="true"></div>
-    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
     <div class="click-fx-layer" id="clickFx" aria-hidden="true"></div>
 
     <header class="header glass">
       <a class="brand" href="#home">CHAMAN<span>.X</span></a>
 
-      <nav>
+      <nav id="siteNav" aria-label="Primary navigation">
+        <button id="navClose" class="btn btn-ghost nav-close" type="button" aria-label="Close navigation menu">Close ✕</button>
+        <button id="motionToggleMenu" class="btn btn-ghost nav-motion-toggle" type="button" data-motion-toggle aria-label="Toggle motion effects">Motion On</button>
         <a href="#about">About</a>
         <a href="#experience">Experience</a>
         <a href="#projects">Projects</a>
@@ -49,9 +50,13 @@
       </nav>
 
       <div class="header-actions">
+        <button id="menuToggle" class="btn btn-ghost menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="siteNav" aria-expanded="false">☰ Menu</button>
         <button id="themeToggle" class="btn btn-ghost" type="button" aria-label="Toggle theme">🌙 Dark</button>
+        <button id="motionToggle" class="btn btn-ghost motion-toggle" type="button" data-motion-toggle aria-label="Toggle motion effects">Motion On</button>
       </div>
     </header>
+
+    <div id="navBackdrop" class="nav-backdrop" aria-hidden="true"></div>
 
     <main id="home">
       <section class="hero" id="heroScene">
@@ -126,21 +131,21 @@
 
               <pre class="fetch-info"><code>chaman@archlinux
 ----------------
-Name       : Chaman S
-Role       : Software Engineer (Full-Stack | MERN | AI Systems)
-Location   : Bengaluru, Karnataka, India
-Phone      : +91 6361005641
-Email      : chaman2003.dev@gmail.com
-Education  : B.E AI & ML (CGPA 8.7), VKIT (2022-2026)
-Intern     : Cortex Craft AI (Jan 2026 - Present)
-Intern     : Edunet Foundation (Mar 2025 - Apr 2025)
-GitHub     : github.com/chaman2003
-LinkedIn   : linkedin.com/in/chaman2003
-LeetCode   : leetcode.com/chaman_2003
-Core       : MERN | Flask | LLMs | RAG | MCP
-DevOps     : Docker | Kubernetes | CI/CD | Linux
-Languages  : English | Hindi | Kannada | Telugu
-Status     : Building production-ready AI products</code></pre>
+Name     : Chaman S
+Role     : Software Engineer (Full-Stack | MERN | AI Systems)
+Location : Bengaluru, Karnataka, India
+Phone    : +91 6361005641
+Email    : chaman2003.dev@gmail.com
+Education: B.E AI & ML (CGPA 8.7), VKIT (2022-2026)
+Intern   : Cortex Craft AI (Jan 2026 - Present)
+Intern   : Edunet Foundation (Mar 2025 - Apr 2025)
+GitHub   : github.com/chaman2003
+LinkedIn : linkedin.com/in/chaman2003
+LeetCode : leetcode.com/chaman_2003
+Core     : MERN | Flask | LLMs | RAG | MCP
+DevOps   : Docker | Kubernetes | CI/CD | Linux
+Languages: English | Hindi | Kannada | Telugu
+Status   : Building production-ready AI products</code></pre>
             </div>
             <form id="fetchForm" class="fetch-input-row" autocomplete="off" aria-label="Top terminal input">
               <label class="sr-only" for="fetchInput">Top terminal command</label>
@@ -154,7 +159,13 @@ Status     : Building production-ready AI products</code></pre>
 
       <section class="ticker-wrap reveal" aria-label="tech ticker">
         <div class="ticker" id="tickerTrack">
-          <span>AI Systems Engineering</span><span>MERN Full-Stack Development</span><span>RAG & Agentic Workflows</span><span>Whisper + OCR Pipelines</span><span>Real-time Socket.IO Apps</span><span>Secure API Architecture</span><span>Docker • Kubernetes • CI/CD</span>
+          <span>AI Systems Engineering</span>
+          <span>MERN Full-Stack Development</span>
+          <span>RAG and Agentic Workflows</span>
+          <span>Whisper plus OCR Pipelines</span>
+          <span>Real-time Socket.IO Apps</span>
+          <span>Secure API Architecture</span>
+          <span>Docker | Kubernetes | CI/CD</span>
         </div>
       </section>
 
@@ -211,7 +222,7 @@ Status     : Building production-ready AI products</code></pre>
         <article class="stat glass"><h3 data-counter="24">0</h3><p>Builder Mode</p></article>
       </section>
 
-      <section class="achievement-strip reveal">
+      <section class="achievement-strip">
         <article class="achievement-card glass"><span>🏆</span><p>Outcome-driven engineering</p></article>
         <article class="achievement-card glass"><span>⚙️</span><p>Production-ready architecture mindset</p></article>
         <article class="achievement-card glass"><span>🧩</span><p>Problem-solving through AI + full-stack systems</p></article>
@@ -381,24 +392,70 @@ Status     : Building production-ready AI products</code></pre>
 
       <section id="skills" class="panel glass reveal">
         <h2>Tech Arsenal</h2>
+        <p class="muted">Combined from Resume + LinkedIn + GitHub and cleaned to avoid redundant tags.</p>
+
         <div class="skills-grid">
-          <span>JavaScript</span><span>TypeScript</span><span>Python</span><span>Java</span>
-          <span>React</span><span>Next.js</span><span>Node.js</span><span>Express</span>
-          <span>MongoDB</span><span>PostgreSQL</span><span>Redis</span><span>Supabase</span>
-          <span>LLMs</span><span>RAG</span><span>LangChain</span><span>MCP</span>
-          <span>Docker</span><span>Kubernetes</span><span>CI/CD</span><span>Vercel</span>
-          <span>Flask</span><span>Tailwind</span><span>REST APIs</span><span>Kafka</span>
+          <span>JavaScript</span>
+          <span>TypeScript</span>
+          <span>Python</span>
+          <span>Java</span>
+          <span>C</span>
+          <span>React</span>
+          <span>Next.js</span>
+          <span>Node.js</span>
+          <span>Express</span>
+          <span>Flask</span>
+          <span>HTML5</span>
+          <span>CSS3</span>
+          <span>Tailwind</span>
+          <span>Bootstrap</span>
+          <span>MongoDB</span>
+          <span>PostgreSQL</span>
+          <span>Redis</span>
+          <span>Supabase</span>
+          <span>Firebase</span>
+          <span>REST APIs</span>
+          <span>Socket.IO</span>
+          <span>JWT Auth</span>
+          <span>LLMs</span>
+          <span>RAG</span>
+          <span>LangChain</span>
+          <span>MCP</span>
+          <span>Whisper</span>
+          <span>OCR</span>
+          <span>Docker</span>
+          <span>Kubernetes</span>
+          <span>CI/CD</span>
+          <span>Linux</span>
+          <span>Git/GitHub</span>
+          <span>Vercel</span>
         </div>
 
-        <div class="skill-logo-grid">
-          <article class="skill-logo-card"><i class="devicon-react-original"></i><span>React</span></article>
-          <article class="skill-logo-card"><i class="devicon-nextjs-plain"></i><span>Next.js</span></article>
-          <article class="skill-logo-card"><i class="devicon-nodejs-plain"></i><span>Node.js</span></article>
-          <article class="skill-logo-card"><i class="devicon-typescript-plain"></i><span>TypeScript</span></article>
-          <article class="skill-logo-card"><i class="devicon-python-plain"></i><span>Python</span></article>
-          <article class="skill-logo-card"><i class="devicon-mongodb-plain"></i><span>MongoDB</span></article>
-          <article class="skill-logo-card"><i class="devicon-postgresql-plain"></i><span>PostgreSQL</span></article>
-          <article class="skill-logo-card"><i class="devicon-docker-plain"></i><span>Docker</span></article>
+        <div class="main-skill-grid">
+          <article class="main-skill-card">
+            <h4>Full-Stack Core</h4>
+            <p>React, Next.js, Node.js, Express, Flask, REST APIs, Socket.IO</p>
+          </article>
+          <article class="main-skill-card">
+            <h4>AI Engineering</h4>
+            <p>LLMs, RAG, LangChain, MCP, Whisper, OCR-based workflows</p>
+          </article>
+          <article class="main-skill-card">
+            <h4>Languages</h4>
+            <p>JavaScript, TypeScript, Python, Java, C</p>
+          </article>
+          <article class="main-skill-card">
+            <h4>Databases</h4>
+            <p>MongoDB, PostgreSQL, Redis, Supabase, Firebase</p>
+          </article>
+          <article class="main-skill-card">
+            <h4>DevOps & Platforms</h4>
+            <p>Docker, Kubernetes, CI/CD, Linux, Vercel, GitHub</p>
+          </article>
+          <article class="main-skill-card">
+            <h4>Product Strength</h4>
+            <p>Scalable architecture, real-time systems, secure auth, polished UX delivery</p>
+          </article>
         </div>
       </section>
 

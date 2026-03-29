@@ -1028,36 +1028,35 @@ body.gh-packed .github-cards {
 }
 .skills-grid span:nth-child(2n) { background: rgba(123, 97, 255, 0.18); }
 
-.skill-logo-grid {
+.main-skill-grid {
   margin-top: 0.8rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.65rem;
 }
 
-.skill-logo-card {
+.main-skill-card {
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface-soft);
-  padding: 0.65rem;
-  display: grid;
-  justify-items: center;
-  gap: 0.35rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(13, 31, 70, 0.42), rgba(8, 21, 46, 0.3));
+  padding: 0.8rem 0.85rem;
 }
 
-.skill-logo-card i {
-  font-size: 1.4rem;
+body[data-theme="light"] .main-skill-card {
+  background: linear-gradient(180deg, rgba(236, 244, 255, 0.9), rgba(227, 238, 255, 0.75));
 }
 
-.skill-logo-card span {
-  font-size: 0.82rem;
-  font-weight: 600;
+.main-skill-card h4 {
+  margin: 0 0 0.32rem;
+  color: var(--text);
+  font-size: 0.98rem;
 }
 
-.skill-logo-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 16px 0 var(--neon-glow);
+.main-skill-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.42;
 }
 
 .lab-grid {
@@ -1434,7 +1433,7 @@ footer { text-align: center; color: var(--muted); padding-bottom: 1.6rem; }
 .project,
 .profile-card,
 .repo-card,
-.skill-logo-card,
+.main-skill-card,
 .stat {
   box-shadow: var(--shadow);
 }
@@ -1443,7 +1442,7 @@ footer { text-align: center; color: var(--muted); padding-bottom: 1.6rem; }
   .project:hover,
   .profile-card:hover,
   .repo-card:hover,
-  .skill-logo-card:hover,
+  .main-skill-card:hover,
   .stat:hover {
     box-shadow: var(--shadow), 0 0 16px 0 var(--neon-glow);
     transition: box-shadow 0.2s ease;
@@ -1816,8 +1815,8 @@ footer { text-align: center; color: var(--muted); padding-bottom: 1.6rem; }
   .repo-card,
   .timeline-item,
   .stat,
-  .skill-logo-card {
-    padding: 0.62rem;
+  .main-skill-card {
+    padding: 0.68rem;
   }
 }
 
