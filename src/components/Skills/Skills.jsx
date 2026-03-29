@@ -5,7 +5,6 @@ export default function Skills() {
   return (
     <section id="skills" className="panel">
       <h2>Tech Arsenal</h2>
-      <p className="muted">Combined from Resume + LinkedIn + GitHub (deduplicated).</p>
 
       <div className="main-skill-grid">
         {MAIN_SKILLS.map((skill) => (
