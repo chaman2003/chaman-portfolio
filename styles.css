@@ -307,8 +307,8 @@ main {
   padding: 0.8rem 0 0.25rem;
   transform-style: preserve-3d;
   display: grid;
-  grid-template-columns: 1.38fr 0.92fr;
-  gap: 0.42rem;
+  grid-template-columns: 1.28fr 1fr;
+  gap: 0.62rem;
   align-items: stretch;
 }
 
@@ -328,11 +328,11 @@ main {
 
 h1 {
   margin: 0.65rem 0;
-  max-width: 960px;
+  max-width: 100%;
   font-family: Inter, system-ui, sans-serif;
-  font-size: clamp(2rem, 4vw, 3.35rem);
+  font-size: clamp(1.9rem, 3.35vw, 3rem);
   font-weight: 800;
-  line-height: 1.18;
+  line-height: 1.14;
 }
 
 h1 span {
@@ -1213,7 +1213,7 @@ footer { text-align: center; color: var(--muted); padding-bottom: 1.6rem; }
 }
 
 @media (max-width: 1080px) {
-  .hero { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: 1fr; gap: 0.72rem; }
   .lab-grid { grid-template-columns: 1fr; }
 }
 

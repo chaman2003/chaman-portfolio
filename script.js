@@ -308,13 +308,13 @@ if (clickFxEl && !prefersReducedMotion) {
   });
 }
 
-// Hero parallax (subtle)
+// Hero parallax (ultra subtle to avoid overlap)
 if (!prefersReducedMotion) {
   window.addEventListener('mousemove', (e) => {
-    if (!heroSceneEl || window.innerWidth < 900) return;
-    const x = (e.clientX / window.innerWidth - 0.5) * 5;
-    const y = (e.clientY / window.innerHeight - 0.5) * 5;
-    heroSceneEl.style.transform = `perspective(1000px) rotateY(${x * 0.25}deg) rotateX(${-y * 0.22}deg)`;
+    if (!heroSceneEl || window.innerWidth < 1200) return;
+    const x = (e.clientX / window.innerWidth - 0.5) * 3;
+    const y = (e.clientY / window.innerHeight - 0.5) * 3;
+    heroSceneEl.style.transform = `perspective(1000px) rotateY(${x * 0.12}deg) rotateX(${-y * 0.1}deg)`;
   });
   window.addEventListener('mouseleave', () => {
     if (!heroSceneEl) return;
