@@ -14,7 +14,161 @@ const labFormEl = document.getElementById('labForm');
 const labInputEl = document.getElementById('labInput');
 const fetchFormEl = document.getElementById('fetchForm');
 const fetchInputEl = document.getElementById('fetchInput');
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const siteNavEl = document.getElementById('siteNav');
+const menuToggleBtn = document.getElementById('menuToggle');
+const navCloseBtn = document.getElementById('navClose');
+const navBackdropEl = document.getElementById('navBackdrop');
+const motionToggleBtns = Array.from(document.querySelectorAll('[data-motion-toggle]'));
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+let userMotionSetting = localStorage.getItem('portfolio_motion') || 'on';
+let motionProfile = null;
+let gsapInitialized = false;
+
+function getViewportTier(width = window.innerWidth) {
+  if (width < 320) return 'watch';
+  if (width < 480) return 'phone';
+  if (width < 768) return 'phablet';
+  if (width < 1024) return 'tablet';
+  if (width < 1440) return 'laptop';
+  if (width < 1920) return 'desktop';
+  return 'ultra';
+}
+
+function buildMotionProfile() {
+  const tier = getViewportTier();
+  const profiles = {
+    watch: {
+      speed: 1.55,
+      intensity: 0.34,
+      sparkModulo: 14,
+      parallaxMinWidth: 9999,
+      parallaxScale: 0,
+      tiltMax: 0,
+      magneticFactor: 0,
+      starCount: 20
+    },
+    phone: {
+      speed: 1.35,
+      intensity: 0.5,
+      sparkModulo: 10,
+      parallaxMinWidth: 9999,
+      parallaxScale: 0,
+      tiltMax: 0,
+      magneticFactor: 0.035,
+      starCount: 32
+    },
+    phablet: {
+      speed: 1.2,
+      intensity: 0.65,
+      sparkModulo: 8,
+      parallaxMinWidth: 1400,
+      parallaxScale: 0,
+      tiltMax: 3,
+      magneticFactor: 0.05,
+      starCount: 48
+    },
+    tablet: {
+      speed: 1.1,
+      intensity: 0.8,
+      sparkModulo: 6,
+      parallaxMinWidth: 1300,
+      parallaxScale: 0.09,
+      tiltMax: 4,
+      magneticFactor: 0.06,
+      starCount: 66
+    },
+    laptop: {
+      speed: 1,
+      intensity: 0.92,
+      sparkModulo: 4,
+      parallaxMinWidth: 1200,
+      parallaxScale: 0.11,
+      tiltMax: 5,
+      magneticFactor: 0.07,
+      starCount: 84
+    },
+    desktop: {
+      speed: 0.95,
+      intensity: 1,
+      sparkModulo: 3,
+      parallaxMinWidth: 1200,
+      parallaxScale: 0.12,
+      tiltMax: 5,
+      magneticFactor: 0.07,
+      starCount: 95
+    },
+    ultra: {
+      speed: 0.9,
+      intensity: 1.08,
+      sparkModulo: 2,
+      parallaxMinWidth: 1300,
+      parallaxScale: 0.13,
+      tiltMax: 6,
+      magneticFactor: 0.08,
+      starCount: 110
+    }
+  };
+
+  const level = profiles[tier];
+  const enabled = userMotionSetting === 'on' && !reducedMotionQuery.matches;
+  return { ...level, tier, enabled };
+}
+
+function isMotionEnabled() {
+  return Boolean(motionProfile?.enabled);
+}
+
+function updateMotionToggleLabel() {
+  if (!motionToggleBtns.length || !motionProfile) return;
+
+  if (reducedMotionQuery.matches) {
+    motionToggleBtns.forEach((btn) => {
+      btn.textContent = 'Motion Off (System)';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.title = 'Motion follows system reduced-motion preference.';
+    });
+    return;
+  }
+
+  motionToggleBtns.forEach((btn) => {
+    btn.textContent = motionProfile.enabled ? 'Motion On' : 'Motion Off';
+    btn.setAttribute('aria-pressed', motionProfile.enabled ? 'true' : 'false');
+    btn.title = motionProfile.enabled
+      ? 'Disable cinematic motion effects'
+      : 'Enable cinematic motion effects';
+  });
+}
+
+function syncMotionProfile() {
+  motionProfile = buildMotionProfile();
+  document.body.setAttribute('data-motion', motionProfile.enabled ? 'on' : 'off');
+  document.body.setAttribute('data-motion-level', motionProfile.tier);
+  document.body.style.setProperty('--motion-speed', String(motionProfile.speed));
+  document.body.style.setProperty('--motion-play-state', motionProfile.enabled ? 'running' : 'paused');
+  updateMotionToggleLabel();
+
+  if (window.gsap?.globalTimeline) {
+    window.gsap.globalTimeline.paused(!motionProfile.enabled);
+  }
+
+  window.dispatchEvent(new Event('motionprofilechange'));
+}
+
+if (typeof reducedMotionQuery.addEventListener === 'function') {
+  reducedMotionQuery.addEventListener('change', syncMotionProfile);
+} else if (typeof reducedMotionQuery.addListener === 'function') {
+  reducedMotionQuery.addListener(syncMotionProfile);
+}
+
+motionToggleBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    userMotionSetting = userMotionSetting === 'on' ? 'off' : 'on';
+    localStorage.setItem('portfolio_motion', userMotionSetting);
+    syncMotionProfile();
+  });
+});
+
+syncMotionProfile();
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -39,6 +193,59 @@ function toggleTheme() {
 }
 
 themeToggleBtn?.addEventListener('click', toggleTheme);
+
+function isDrawerViewport() {
+  return window.innerWidth <= 1023;
+}
+
+function setNavOpen(open) {
+  const shouldOpen = Boolean(open) && isDrawerViewport();
+  document.body.classList.toggle('nav-open', shouldOpen);
+  menuToggleBtn?.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+  siteNavEl?.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+  navBackdropEl?.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+}
+
+function closeNav() {
+  setNavOpen(false);
+}
+
+function toggleNav() {
+  setNavOpen(!document.body.classList.contains('nav-open'));
+}
+
+function syncNavForViewport() {
+  if (!isDrawerViewport()) {
+    document.body.classList.remove('nav-open');
+    menuToggleBtn?.setAttribute('aria-expanded', 'false');
+    siteNavEl?.removeAttribute('aria-hidden');
+    navBackdropEl?.setAttribute('aria-hidden', 'true');
+    return;
+  }
+
+  const navOpen = document.body.classList.contains('nav-open');
+  menuToggleBtn?.setAttribute('aria-expanded', navOpen ? 'true' : 'false');
+  siteNavEl?.setAttribute('aria-hidden', navOpen ? 'false' : 'true');
+  navBackdropEl?.setAttribute('aria-hidden', navOpen ? 'false' : 'true');
+}
+
+menuToggleBtn?.addEventListener('click', toggleNav);
+navCloseBtn?.addEventListener('click', closeNav);
+navBackdropEl?.addEventListener('click', closeNav);
+
+siteNavEl?.addEventListener('click', (event) => {
+  const link = event.target.closest('a[href^="#"]');
+  if (!link) return;
+  closeNav();
+});
+
+window.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  closeNav();
+});
+
+window.addEventListener('resize', syncNavForViewport);
+syncNavForViewport();
 
 // Active nav highlight
 const navLinks = Array.from(document.querySelectorAll('nav a[href^="#"]'));
@@ -72,6 +279,22 @@ const GROQ_API_KEY =
   localStorage.getItem('vrik_groq_key') ||
   'REPLACE_WITH_GROQ_API_KEY';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GITHUB_TOKEN =
+  window.__VRIK_RUNTIME__?.GITHUB_TOKEN ||
+  localStorage.getItem('vrik_github_token') ||
+  '';
+
+function getGitHubHeaders() {
+  const headers = {
+    Accept: 'application/vnd.github+json'
+  };
+
+  if (GITHUB_TOKEN && GITHUB_TOKEN !== 'REPLACE_WITH_GITHUB_TOKEN') {
+    headers.Authorization = `Bearer ${GITHUB_TOKEN}`;
+  }
+
+  return headers;
+}
 
 const resumeRagChunks = [
   'Professional summary: AI & ML undergraduate and full-stack developer specializing in AI-driven systems and real-time applications. Experienced with MERN and Python solutions integrating LLM, STT, and TTS workflows.',
@@ -79,7 +302,7 @@ const resumeRagChunks = [
   'Internship: Cortex Craft AI (Jan 2026 - Present), building AI-first POCs with LLM integration, agentic/RAG workflows, secure APIs, and scalable architectures.',
   'Internship: Edunet Foundation (Mar 2025 - Apr 2025), built PeakHive MERN e-commerce platform, improved engagement by 50% and reduced order-processing errors by 20%.',
   'Projects: Epsilora AI, PrintChakra AI, PeakHive, Tic Tac Toe AI.',
-  'Skills: React, TypeScript, Node.js, Express, Python, Flask, MongoDB, PostgreSQL, LLMs, RAG, LangChain, MCP, Docker, Kubernetes, CI/CD.',
+  'Skills: JavaScript, TypeScript, React, Next.js, Node.js, Express, MERN, Python, Flask, MongoDB, PostgreSQL, Redis, Supabase, LLMs, RAG, LangChain, MCP, Socket.IO, Whisper, OCR, Docker, Kubernetes, CI/CD, Linux, REST APIs, Tailwind, Vercel.',
   'Achievements: ₹4,500 sponsorship for PrintChakra AI, 1st rank in 3rd and 6th semester, SCIMAGINATION 2K23 and 2K25 2nd place.'
 ];
 
@@ -96,7 +319,7 @@ let terminalBusy = false;
 const labResponses = {
   help: `Available commands:\n- help\n- about\n- stack\n- focus\n- contact\n- github\n- linkedin\n- resume\n- achievements\n- languages\n- ai.summary\n- ai.projects\n- ai.skills\n- ask <question>\n- clear`,
   about: `Chaman S\nSoftware Engineer (Full-Stack | MERN | AI Systems)\nAI & ML Undergraduate (B.E, CGPA 8.7)\nBengaluru, Karnataka`,
-  stack: `Core Stack:\n- React, TypeScript, Node.js, Express\n- Python, Flask, Socket.IO\n- MongoDB, PostgreSQL, Supabase\n- LLMs, RAG, LangChain, MCP\n- Docker, Kubernetes, CI/CD`,
+  stack: `Core Stack:\n- JavaScript, TypeScript, React, Next.js\n- Node.js, Express, MERN, Flask\n- MongoDB, PostgreSQL, Redis, Supabase\n- LLMs, RAG, LangChain, MCP, Whisper, OCR\n- Docker, Kubernetes, CI/CD, Linux\n- REST APIs, Socket.IO, Tailwind, Vercel`,
   focus: `Current Focus:\n- AI-first full-stack systems\n- Voice + OCR workflows\n- Secure, scalable architecture\n- Production-ready deployment`,
   contact: `Contact:\nEmail: chaman2003.dev@gmail.com\nPhone: +91 6361005641\nLinkedIn: linkedin.com/in/chaman2003\nGitHub: github.com/chaman2003`,
   github: `GitHub Snapshot:\n- Username: @chaman2003\n- Full-stack + AI repositories\n- Fast iteration + polished product mindset`,
@@ -190,7 +413,7 @@ async function callGroqWithRag(query, { short = false } = {}) {
 
 function typeToElement(el, text) {
   if (!el) return;
-  if (prefersReducedMotion) {
+  if (!isMotionEnabled()) {
     el.textContent = text;
     return;
   }
@@ -386,6 +609,10 @@ let deleting = false;
 
 function runTypewriter() {
   if (!typewriterEl) return;
+  if (!isMotionEnabled()) {
+    typewriterEl.textContent = lines[0];
+    return setTimeout(runTypewriter, 360);
+  }
   const current = lines[lineIndex];
 
   if (!deleting) {
@@ -404,95 +631,229 @@ function runTypewriter() {
     }
   }
 
-  setTimeout(runTypewriter, deleting ? 30 : 56);
+  const wait = Math.round((deleting ? 30 : 56) * (motionProfile?.speed || 1));
+  setTimeout(runTypewriter, wait);
 }
 runTypewriter();
 
-// Cursor glow follow
-const cursorGlow = document.getElementById('cursorGlow');
+// Cursor trail (enhanced cinematic style)
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
-if (hasFinePointer && !prefersReducedMotion) {
-  let sparkTick = 0;
+let lastTrailStamp = 0;
+let lastTrailMoveStamp = 0;
+let lastTrailX = null;
+let lastTrailY = null;
+let trailStepCounter = 0;
+
+function spawnTrailDot(x, y, speed = 0, angleDeg = 0) {
+  if (!clickFxEl) return;
+
+  const dot = document.createElement('span');
+  dot.className = 'cursor-trail-dot';
+  dot.style.left = `${x.toFixed(1)}px`;
+  dot.style.top = `${y.toFixed(1)}px`;
+
+  const speedBoost = Math.min(speed / 1200, 1);
+  const intensity = motionProfile?.intensity || 1;
+  const trailSize = (7.5 + Math.random() * 2.4 + speedBoost * 2.8) * (0.92 + intensity * 0.12);
+  const trailAlpha = Math.min(0.95, 0.52 + Math.random() * 0.2 + speedBoost * 0.18);
+  const trailDuration = (300 + Math.random() * 120 + speedBoost * 140) * (0.95 + intensity * 0.08);
+  const trailStretch = 1 + speedBoost * 0.8;
+  const drift = 1.5 + speedBoost * 2.8;
+  const rad = (angleDeg * Math.PI) / 180;
+  const trailDriftX = Math.cos(rad) * drift;
+  const trailDriftY = Math.sin(rad) * drift;
+  const trailHue = 196 + Math.random() * 24;
+
+  dot.style.setProperty('--trail-size', `${trailSize.toFixed(1)}px`);
+  dot.style.setProperty('--trail-alpha', `${trailAlpha.toFixed(2)}`);
+  dot.style.setProperty('--trail-duration', `${trailDuration.toFixed(0)}ms`);
+  dot.style.setProperty('--trail-stretch', `${trailStretch.toFixed(2)}`);
+  dot.style.setProperty('--trail-angle', `${angleDeg.toFixed(1)}deg`);
+  dot.style.setProperty('--trail-drift-x', `${trailDriftX.toFixed(2)}px`);
+  dot.style.setProperty('--trail-drift-y', `${trailDriftY.toFixed(2)}px`);
+  dot.style.setProperty('--trail-hue', `${trailHue.toFixed(0)}`);
+
+  clickFxEl.appendChild(dot);
+  setTimeout(() => dot.remove(), Math.round(trailDuration) + 120);
+}
+
+function spawnTrailSpark(x, y, speed = 0, angleDeg = 0) {
+  if (!clickFxEl) return;
+
+  const spark = document.createElement('span');
+  spark.className = 'cursor-trail-spark';
+  spark.style.left = `${x.toFixed(1)}px`;
+  spark.style.top = `${y.toFixed(1)}px`;
+
+  const speedBoost = Math.min(speed / 1300, 1);
+  const spread = 6 + speedBoost * 9;
+  const jitter = (Math.random() - 0.5) * 34;
+  const finalAngle = angleDeg + jitter;
+  const rad = (finalAngle * Math.PI) / 180;
+  const driftX = Math.cos(rad) * spread;
+  const driftY = Math.sin(rad) * spread;
+
+  spark.style.setProperty('--spark-drift-x', `${driftX.toFixed(2)}px`);
+  spark.style.setProperty('--spark-drift-y', `${driftY.toFixed(2)}px`);
+  spark.style.setProperty('--spark-size', `${(2.2 + Math.random() * 1.7 + speedBoost).toFixed(1)}px`);
+  spark.style.setProperty('--spark-duration', `${(240 + Math.random() * 120 + speedBoost * 120).toFixed(0)}ms`);
+
+  clickFxEl.appendChild(spark);
+  setTimeout(() => spark.remove(), 420);
+}
+
+function spawnTrailRing(x, y, speed = 0) {
+  if (!clickFxEl) return;
+
+  const ring = document.createElement('span');
+  ring.className = 'cursor-trail-ring';
+  ring.style.left = `${x.toFixed(1)}px`;
+  ring.style.top = `${y.toFixed(1)}px`;
+  const size = 8 + Math.min(speed / 180, 10);
+  ring.style.setProperty('--ring-size', `${size.toFixed(1)}px`);
+  ring.style.setProperty('--ring-duration', `${(420 + Math.min(speed / 3.8, 180)).toFixed(0)}ms`);
+
+  clickFxEl.appendChild(ring);
+  setTimeout(() => ring.remove(), 700);
+}
+
+if (hasFinePointer) {
   window.addEventListener('mousemove', (e) => {
-    if (cursorGlow) {
-      cursorGlow.style.left = `${e.clientX - 130}px`;
-      cursorGlow.style.top = `${e.clientY - 130}px`;
+    if (!clickFxEl || !isMotionEnabled()) return;
+
+    const now = performance.now();
+    if (now - lastTrailStamp <= 24) return;
+
+    let speed = 0;
+    let angleDeg = 0;
+
+    if (lastTrailX !== null && lastTrailY !== null) {
+      const dt = Math.max(now - lastTrailMoveStamp, 8);
+      const dx = e.clientX - lastTrailX;
+      const dy = e.clientY - lastTrailY;
+      const distance = Math.hypot(dx, dy);
+      speed = (distance / dt) * 1000;
+      angleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      const bridgeSteps = Math.min(3, Math.floor(distance / 16));
+      for (let i = 1; i <= bridgeSteps; i++) {
+        const t = i / (bridgeSteps + 1);
+        const ix = lastTrailX + dx * t;
+        const iy = lastTrailY + dy * t;
+        spawnTrailDot(ix, iy, speed * 0.8, angleDeg);
+      }
     }
 
-    if (!clickFxEl) return;
-    sparkTick += 1;
-    if (sparkTick % 3 !== 0) return;
+    lastTrailStamp = now;
+    lastTrailMoveStamp = now;
+    lastTrailX = e.clientX;
+    lastTrailY = e.clientY;
+    trailStepCounter += 1;
 
-    const spark = document.createElement('span');
-    spark.className = 'cursor-spark';
-    spark.style.left = `${e.clientX + (Math.random() * 10 - 5)}px`;
-    spark.style.top = `${e.clientY + (Math.random() * 10 - 5)}px`;
-    clickFxEl.appendChild(spark);
-    setTimeout(() => spark.remove(), 560);
+    spawnTrailDot(e.clientX, e.clientY, speed, angleDeg);
+
+    const sparkModulo = Math.max(2, motionProfile?.sparkModulo || 4);
+    if (trailStepCounter % sparkModulo === 0) {
+      spawnTrailSpark(e.clientX, e.clientY, speed, angleDeg);
+    }
+
+    if (speed > 980 && trailStepCounter % (sparkModulo + 1) === 0) {
+      spawnTrailSpark(e.clientX, e.clientY, speed * 0.9, angleDeg + 8);
+    }
   });
-} else if (cursorGlow) {
-  cursorGlow.style.display = 'none';
-}
 
-// Click burst effect
-if (clickFxEl && !prefersReducedMotion) {
   window.addEventListener('pointerdown', (e) => {
-    const ring = document.createElement('span');
-    ring.className = 'click-ring';
-    ring.style.left = `${e.clientX}px`;
-    ring.style.top = `${e.clientY}px`;
-    clickFxEl.appendChild(ring);
-    setTimeout(() => ring.remove(), 720);
+    if (!clickFxEl || !isMotionEnabled()) return;
+    spawnTrailRing(e.clientX, e.clientY, 1000);
+    for (let i = 0; i < 4; i++) {
+      spawnTrailSpark(e.clientX, e.clientY, 980, i * 90 + Math.random() * 22);
+    }
+  });
+
+  window.addEventListener('mouseleave', () => {
+    lastTrailX = null;
+    lastTrailY = null;
+    lastTrailMoveStamp = 0;
   });
 }
+
+window.addEventListener('motionprofilechange', () => {
+  if (!isMotionEnabled() && clickFxEl) {
+    clickFxEl.replaceChildren();
+    lastTrailX = null;
+    lastTrailY = null;
+    lastTrailMoveStamp = 0;
+    trailStepCounter = 0;
+  }
+});
 
 // Hero parallax (ultra subtle to avoid overlap)
-if (!prefersReducedMotion) {
-  window.addEventListener('mousemove', (e) => {
-    if (!heroSceneEl || window.innerWidth < 1200) return;
-    const x = (e.clientX / window.innerWidth - 0.5) * 3;
-    const y = (e.clientY / window.innerHeight - 0.5) * 3;
-    heroSceneEl.style.transform = `perspective(1000px) rotateY(${x * 0.12}deg) rotateX(${-y * 0.1}deg)`;
-  });
-  window.addEventListener('mouseleave', () => {
-    if (!heroSceneEl) return;
-    heroSceneEl.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
-  });
-}
+window.addEventListener('mousemove', (e) => {
+  if (!heroSceneEl || !isMotionEnabled()) return;
+  if (window.innerWidth < (motionProfile?.parallaxMinWidth || 1200)) return;
+  const x = (e.clientX / window.innerWidth - 0.5) * 3;
+  const y = (e.clientY / window.innerHeight - 0.5) * 3;
+  const scale = motionProfile?.parallaxScale || 0.1;
+  heroSceneEl.style.transform = `perspective(1000px) rotateY(${x * scale}deg) rotateX(${-y * scale}deg)`;
+});
+window.addEventListener('mouseleave', () => {
+  if (!heroSceneEl) return;
+  heroSceneEl.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+});
+window.addEventListener('motionprofilechange', () => {
+  if (!heroSceneEl || isMotionEnabled()) return;
+  heroSceneEl.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+});
 
 // 3D tilt cards (subtle)
 const tiltCards = document.querySelectorAll('.tilt');
-if (!prefersReducedMotion) {
-  tiltCards.forEach((card) => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const rotateY = ((x / rect.width) - 0.5) * 5;
-      const rotateX = (0.5 - y / rect.height) * 5;
-      card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg)';
-    });
+tiltCards.forEach((card) => {
+  card.addEventListener('mousemove', (e) => {
+    if (!isMotionEnabled() || !hasFinePointer) return;
+    const maxTilt = motionProfile?.tiltMax || 0;
+    if (maxTilt <= 0) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rotateY = ((x / rect.width) - 0.5) * maxTilt;
+    const rotateX = (0.5 - y / rect.height) * maxTilt;
+    card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
   });
-}
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg)';
+  });
+});
+
+window.addEventListener('motionprofilechange', () => {
+  if (isMotionEnabled()) return;
+  tiltCards.forEach((card) => {
+    card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg)';
+  });
+});
 
 // Magnetic buttons (very subtle)
 const magneticButtons = document.querySelectorAll('.magnetic');
-if (!prefersReducedMotion) {
-  magneticButtons.forEach((btn) => {
-    btn.addEventListener('mousemove', (e) => {
-      const rect = btn.getBoundingClientRect();
-      const x = e.clientX - (rect.left + rect.width / 2);
-      const y = e.clientY - (rect.top + rect.height / 2);
-      btn.style.transform = `translate(${x * 0.07}px, ${y * 0.07}px)`;
-    });
-    btn.addEventListener('mouseleave', () => {
-      btn.style.transform = 'translate(0, 0)';
-    });
+magneticButtons.forEach((btn) => {
+  btn.addEventListener('mousemove', (e) => {
+    if (!isMotionEnabled() || !hasFinePointer) return;
+    const factor = motionProfile?.magneticFactor || 0;
+    if (factor <= 0) return;
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
+    btn.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
   });
-}
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = 'translate(0, 0)';
+  });
+});
+
+window.addEventListener('motionprofilechange', () => {
+  if (isMotionEnabled()) return;
+  magneticButtons.forEach((btn) => {
+    btn.style.transform = 'translate(0, 0)';
+  });
+});
 
 // GitHub API data
 const featuredRepoNames = new Set([
@@ -507,18 +868,42 @@ function normalizeRepoName(name = '') {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
+function escapeHtml(value = '') {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function truncateText(text = '', maxLength = 190) {
+  const clean = String(text || '').trim();
+  if (clean.length <= maxLength) return clean;
+  return `${clean.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
 function getGithubCols() {
   const w = window.innerWidth;
-  if (w >= 1700) return 5;
-  if (w >= 1280) return 4;
-  if (w >= 980) return 3;
+  if (w >= 1680) return 4;
+  if (w >= 1180) return 3;
+  if (w >= 760) return 2;
   if (w >= 640) return 2;
   return 1;
 }
 
 async function loadGitHubData() {
+  if (!ghCardsEl) return;
+
   try {
-    const userRes = await fetch('https://api.github.com/users/chaman2003');
+    const userRes = await fetch('https://api.github.com/users/chaman2003', {
+      headers: getGitHubHeaders()
+    });
+    if (!userRes.ok) {
+      const userErr = await userRes.json().catch(() => null);
+      const errMsg = userErr?.message ? `: ${userErr.message}` : '';
+      throw new Error(`GitHub user request failed (${userRes.status})${errMsg}`);
+    }
     const user = await userRes.json();
 
     if (ghHeadlineEl && user?.login) {
@@ -527,10 +912,19 @@ async function loadGitHubData() {
 
     githubProfileChunk = `GitHub profile ${user?.login || 'chaman2003'}: ${user?.public_repos ?? 0} public repos, ${user?.followers ?? 0} followers, location ${user?.location || 'not specified'}, bio: ${user?.bio || 'N/A'}.`;
 
-    const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=30');
+    const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=30', {
+      headers: getGitHubHeaders()
+    });
+    if (!reposRes.ok) {
+      const reposErr = await reposRes.json().catch(() => null);
+      const errMsg = reposErr?.message ? `: ${reposErr.message}` : '';
+      throw new Error(`GitHub repos request failed (${reposRes.status})${errMsg}`);
+    }
     const repos = await reposRes.json();
 
-    if (!Array.isArray(repos) || !ghCardsEl) return;
+    if (!Array.isArray(repos)) {
+      throw new Error('GitHub repos response format is invalid.');
+    }
 
     githubRagChunks = repos
       .filter((r) => r.description && r.description.trim())
@@ -558,30 +952,45 @@ async function loadGitHubData() {
 
     ghCardsEl.innerHTML = curatedRepos
       .map((repo) => {
-        const desc = repo.description;
-        const lang = repo.language || 'Mixed';
+        const name = escapeHtml(repo.name || 'Untitled Repo');
+        const desc = escapeHtml(truncateText(repo.description || 'No description provided yet.'));
+        const lang = escapeHtml(repo.language || 'Mixed');
+        const stars = Number(repo.stargazers_count || 0);
+        const branches = Number(repo.forks_count || 0);
+
+        const metaChips = [
+          stars > 0 ? `<span class="repo-meta-chip">★ ${stars}</span>` : '',
+          branches > 0 ? `<span class="repo-meta-chip">⑂ ${branches}</span>` : '',
+          `<span class="repo-meta-chip repo-lang">${lang}</span>`
+        ]
+          .filter(Boolean)
+          .join('');
+
         return `
           <article class="repo-card">
             <div class="repo-top">
-              <h4><a class="project-link-title" href="${repo.html_url}" target="_blank" rel="noreferrer">${repo.name}</a></h4>
-              <a class="inline-link" href="${repo.html_url}" target="_blank" rel="noreferrer">Open</a>
+              <h4><a class="project-link-title" href="${repo.html_url}" target="_blank" rel="noreferrer" title="${name}">${name}</a></h4>
+              <a class="inline-link repo-open" href="${repo.html_url}" target="_blank" rel="noreferrer" aria-label="Open ${name}">Open</a>
             </div>
-            <p>${desc}</p>
-            <div class="repo-meta">
-              <span>★ ${repo.stargazers_count}</span>
-              <span>⑂ ${repo.forks_count}</span>
-              <span>${lang}</span>
-            </div>
+            <p class="repo-desc" title="${desc}">${desc}</p>
+            <div class="repo-meta">${metaChips}</div>
           </article>
         `;
       })
       .join('');
   } catch (error) {
+    const errorText = String(error?.message || '').toLowerCase();
+    const isRateLimited = errorText.includes('rate limit');
+
     if (ghCardsEl) {
-      ghCardsEl.innerHTML = '<p class="muted">Could not load GitHub data right now. Refresh shortly.</p>';
+      ghCardsEl.innerHTML = isRateLimited
+        ? '<p class="muted">GitHub API rate limit reached. Please wait a bit and refresh.</p>'
+        : '<p class="muted">Could not load GitHub data right now. Refresh shortly.</p>';
     }
     if (ghHeadlineEl) {
-      ghHeadlineEl.textContent = 'GitHub sync temporarily unavailable.';
+      ghHeadlineEl.textContent = isRateLimited
+        ? 'GitHub rate limit reached. Try again shortly.'
+        : 'GitHub sync temporarily unavailable.';
     }
   }
 }
@@ -591,6 +1000,8 @@ let githubReloadTimer;
 window.addEventListener('resize', () => {
   clearTimeout(githubReloadTimer);
   githubReloadTimer = setTimeout(() => {
+    syncMotionProfile();
+    initGsapAnimations();
     loadGitHubData();
     setupInfiniteMarquee(tickerTrack);
     setupInfiniteMarquee(logoMarqueeEl);
@@ -598,54 +1009,59 @@ window.addEventListener('resize', () => {
 });
 
 // GSAP premium animations
-if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
+function initGsapAnimations() {
+  if (gsapInitialized || !window.gsap || !window.ScrollTrigger || !isMotionEnabled()) return;
+  gsapInitialized = true;
   gsap.registerPlugin(ScrollTrigger);
+
+  const speed = motionProfile?.speed || 1;
+  const intensity = motionProfile?.intensity || 1;
 
   gsap.from('.header', {
     y: -24,
     opacity: 0,
-    duration: 0.8,
+    duration: 0.8 * speed,
     ease: 'power3.out'
   });
 
   gsap.from('.hero-content > *', {
     y: 24,
     opacity: 0,
-    duration: 0.8,
-    stagger: 0.08,
+    duration: 0.8 * speed,
+    stagger: 0.08 * speed,
     ease: 'power3.out'
   });
 
   gsap.from('.hero-side', {
     x: 30,
     opacity: 0,
-    duration: 0.9,
+    duration: 0.9 * speed,
     ease: 'power3.out'
   });
 
   gsap.from('.quick-meta span, .floating-tags span, .fetch-terminal', {
     y: 14,
     opacity: 0,
-    duration: 0.7,
-    stagger: 0.06,
-    delay: 0.2,
+    duration: 0.7 * speed,
+    stagger: 0.06 * speed,
+    delay: 0.2 * speed,
     ease: 'power2.out'
   });
 
   gsap.to('.logo-pill', {
-    y: -4,
-    duration: 1.6,
+    y: -4 * intensity,
+    duration: 1.6 * speed,
     ease: 'sine.inOut',
     repeat: -1,
     yoyo: true,
-    stagger: 0.12
+    stagger: 0.12 * speed
   });
 
-  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card, .achievement-card, .exp-card, .lab-controls, .lab-console-wrap').forEach((el) => {
+  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card, .exp-card, .lab-controls, .lab-console-wrap').forEach((el) => {
     gsap.from(el, {
       y: 26,
       opacity: 0,
-      duration: 0.8,
+      duration: 0.8 * speed,
       ease: 'power3.out',
       scrollTrigger: {
         trigger: el,
@@ -656,6 +1072,15 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
     });
   });
 }
+
+window.addEventListener('motionprofilechange', () => {
+  initGsapAnimations();
+  if (window.gsap?.globalTimeline) {
+    window.gsap.globalTimeline.paused(!isMotionEnabled());
+  }
+});
+
+initGsapAnimations();
 
 function setupInfiniteMarquee(trackEl) {
   if (!trackEl) return;
@@ -694,11 +1119,15 @@ setupInfiniteMarquee(tickerTrack);
 setupInfiniteMarquee(logoMarqueeEl);
 
 // keep marquees smooth if user switches tab/visibility
-document.addEventListener('visibilitychange', () => {
-  const playState = document.hidden ? 'paused' : 'running';
+function syncMarqueePlayState() {
+  const playState = document.hidden || !isMotionEnabled() ? 'paused' : 'running';
   if (tickerTrack) tickerTrack.style.animationPlayState = playState;
   if (logoMarqueeEl) logoMarqueeEl.style.animationPlayState = playState;
-});
+}
+
+document.addEventListener('visibilitychange', syncMarqueePlayState);
+window.addEventListener('motionprofilechange', syncMarqueePlayState);
+syncMarqueePlayState();
 
 // Starfield background
 const canvas = document.getElementById('starfield');
@@ -706,11 +1135,18 @@ const ctx = canvas?.getContext('2d');
 
 if (canvas && ctx) {
   const stars = [];
-  const starCount = prefersReducedMotion ? 45 : 95;
+  let starCount = motionProfile?.starCount || 70;
 
   function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+  }
+
+  function syncStarCount() {
+    const next = motionProfile?.starCount || 70;
+    if (next === starCount) return;
+    starCount = next;
+    seedStars();
   }
 
   function seedStars() {
@@ -729,28 +1165,41 @@ if (canvas && ctx) {
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    const intensity = isMotionEnabled() ? (motionProfile?.intensity || 1) : 0;
+
     for (const s of stars) {
       ctx.beginPath();
       ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fill();
 
-      s.y += s.speed;
-      if (s.y > canvas.height) {
-        s.y = -5;
-        s.x = Math.random() * canvas.width;
+      if (intensity > 0) {
+        s.y += s.speed * intensity;
+        if (s.y > canvas.height) {
+          s.y = -5;
+          s.x = Math.random() * canvas.width;
+        }
       }
     }
 
-    requestAnimationFrame(draw);
+    if (intensity > 0) {
+      requestAnimationFrame(draw);
+    } else {
+      setTimeout(() => requestAnimationFrame(draw), 120);
+    }
   }
 
   resize();
   seedStars();
   draw();
 
+  window.addEventListener('motionprofilechange', () => {
+    syncStarCount();
+  });
+
   window.addEventListener('resize', () => {
     resize();
+    syncStarCount();
     seedStars();
   });
 }
