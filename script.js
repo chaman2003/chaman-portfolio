@@ -14,7 +14,6 @@ const labFormEl = document.getElementById('labForm');
 const labInputEl = document.getElementById('labInput');
 const fetchFormEl = document.getElementById('fetchForm');
 const fetchInputEl = document.getElementById('fetchInput');
-const fetchOutputEl = document.getElementById('fetchOutput');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
