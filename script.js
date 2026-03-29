@@ -68,7 +68,10 @@ if ('IntersectionObserver' in window) {
 }
 
 // Intelligent terminal commands (Groq + local RAG)
-const GROQ_API_KEY = localStorage.getItem('vrik_groq_key') || 'REPLACE_WITH_GROQ_API_KEY';
+const GROQ_API_KEY =
+  window.__VRIK_RUNTIME__?.GROQ_API_KEY ||
+  localStorage.getItem('vrik_groq_key') ||
+  'REPLACE_WITH_GROQ_API_KEY';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 const resumeRagChunks = [
@@ -148,7 +151,7 @@ function retrieveRagContext(query, topK = 6) {
 
 async function callGroqWithRag(query, { short = false } = {}) {
   if (!GROQ_API_KEY || GROQ_API_KEY === 'REPLACE_WITH_GROQ_API_KEY') {
-    throw new Error('Groq API key missing. Set localStorage key "vrik_groq_key" and retry.');
+    throw new Error('AI key not configured.');
   }
 
   const context = retrieveRagContext(query);
@@ -208,10 +211,6 @@ function typeToLab(text) {
   typeToElement(labOutputEl, text);
 }
 
-function setTopTerminalStatus(text) {
-  if (!fetchOutputEl) return;
-  fetchOutputEl.textContent = text;
-}
 
 function setActiveLabButton(cmd) {
   labButtons.forEach((b) => {
@@ -236,7 +235,6 @@ async function executeLabCommand(rawCommand, opts = { store: true, source: 'lab'
 
   if (normalized === 'clear') {
     typeToLab('');
-    setTopTerminalStatus('Cleared. Top terminal is connected to the Interactive Lab below.');
     return;
   }
 
@@ -259,9 +257,6 @@ async function executeLabCommand(rawCommand, opts = { store: true, source: 'lab'
     try {
       terminalBusy = true;
       typeToLab(`> ${commandRaw}\n\nthinking..`);
-      if (opts.source === 'top') {
-        setTopTerminalStatus(`Sent to lab: ${commandRaw}`);
-      }
       const response = await callGroqWithRag(aiQuery);
       typeToLab(`> ${commandRaw}\n\n${response}`);
     } catch (err) {
@@ -274,9 +269,6 @@ async function executeLabCommand(rawCommand, opts = { store: true, source: 'lab'
 
   const response = labResponses[normalized] || `Unknown command: ${commandRaw}\nTry: ask summarize my internships`;
   typeToLab(`> ${commandRaw}\n\n${response}`);
-  if (opts.source === 'top') {
-    setTopTerminalStatus(`Sent to lab: ${commandRaw}`);
-  }
 }
 
 if (labButtons.length) {
@@ -290,7 +282,6 @@ function handleSharedSubmit(inputEl, source) {
   if (!cmd.trim()) return;
   executeLabCommand(cmd, { source });
   if (source === 'top') {
-    if (labInputEl) labInputEl.value = cmd;
     document.getElementById('lab')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
   if (inputEl) inputEl.value = '';
