@@ -11,6 +11,11 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+// Preloader
+const preloaderDone = () => document.body.classList.add('loaded');
+window.addEventListener('load', () => setTimeout(preloaderDone, 420));
+setTimeout(preloaderDone, 1800);
+
 // Theme toggle
 const storedTheme = localStorage.getItem('theme');
 if (storedTheme === 'light') {
@@ -27,6 +32,32 @@ function toggleTheme() {
 }
 
 themeToggleBtn?.addEventListener('click', toggleTheme);
+
+// Active nav highlight
+const navLinks = Array.from(document.querySelectorAll('nav a[href^="#"]'));
+const sectionMap = navLinks
+  .map((link) => {
+    const target = document.querySelector(link.getAttribute('href'));
+    return target ? { link, target } : null;
+  })
+  .filter(Boolean);
+
+if ('IntersectionObserver' in window) {
+  const navObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const current = sectionMap.find((s) => s.target === entry.target);
+        if (!current) return;
+        navLinks.forEach((l) => l.classList.remove('active'));
+        current.link.classList.add('active');
+      });
+    },
+    { threshold: 0.35 }
+  );
+
+  sectionMap.forEach((s) => navObserver.observe(s.target));
+}
 
 // Scroll progress
 function updateScrollProgress() {

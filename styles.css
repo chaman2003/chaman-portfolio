@@ -59,6 +59,38 @@ body {
   position: relative;
 }
 
+.preloader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  z-index: 120;
+  transition: opacity 0.55s ease, visibility 0.55s ease;
+}
+
+.preloader-core {
+  font-family: Orbitron, Inter, sans-serif;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  box-shadow: 0 0 24px 0 var(--neon-glow);
+  animation: preloader-pulse 1.2s ease-in-out infinite;
+}
+
+body.loaded .preloader {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes preloader-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.8; }
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -217,8 +249,19 @@ body[data-theme="light"]::before {
 .header-actions { display: flex; gap: 0.55rem; }
 
 nav { display: flex; gap: 1rem; flex-wrap: wrap; }
-nav a { text-decoration: none; color: var(--muted); font-size: 0.93rem; }
-nav a:hover { color: var(--text); }
+nav a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.93rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+nav a:hover,
+nav a.active {
+  color: var(--text);
+  background: var(--surface-soft);
+}
 
 main {
   width: calc(100% - 0.6rem);
@@ -328,6 +371,23 @@ h1 span {
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
+}
+
+.scroll-cue {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.86rem;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  animation: cue-bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes cue-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
 }
 
 .btn {
@@ -529,6 +589,29 @@ h1 span {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 0.72rem;
+}
+
+.achievement-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.72rem;
+}
+
+.achievement-card {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.65rem 0.75rem;
+}
+
+.achievement-card span {
+  font-size: 1.1rem;
+}
+
+.achievement-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
 }
 .stat { border-radius: 14px; padding: 0.78rem; }
 .stat h3 { margin: 0; font-size: 1.5rem; color: var(--primary); }
