@@ -7,6 +7,7 @@ const heroSceneEl = document.getElementById('heroScene');
 const themeToggleBtn = document.getElementById('themeToggle');
 const logoMarqueeEl = document.getElementById('logoMarquee');
 const clickFxEl = document.getElementById('clickFx');
+const backToTopBtn = document.getElementById('backToTop');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -61,14 +62,24 @@ if ('IntersectionObserver' in window) {
 
 // Scroll progress
 function updateScrollProgress() {
-  if (!scrollProgressEl) return;
   const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
   const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
   const ratio = height > 0 ? (scrollTop / height) * 100 : 0;
-  scrollProgressEl.style.width = `${ratio}%`;
+
+  if (scrollProgressEl) {
+    scrollProgressEl.style.width = `${ratio}%`;
+  }
+
+  if (backToTopBtn) {
+    backToTopBtn.classList.toggle('visible', scrollTop > 260);
+  }
 }
 window.addEventListener('scroll', updateScrollProgress);
 updateScrollProgress();
+
+backToTopBtn?.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
 // Reveal on scroll (safe fallback)
 const reveals = document.querySelectorAll('.reveal');
@@ -150,10 +161,23 @@ runTypewriter();
 const cursorGlow = document.getElementById('cursorGlow');
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 if (hasFinePointer && !prefersReducedMotion) {
+  let sparkTick = 0;
   window.addEventListener('mousemove', (e) => {
-    if (!cursorGlow) return;
-    cursorGlow.style.left = `${e.clientX - 130}px`;
-    cursorGlow.style.top = `${e.clientY - 130}px`;
+    if (cursorGlow) {
+      cursorGlow.style.left = `${e.clientX - 130}px`;
+      cursorGlow.style.top = `${e.clientY - 130}px`;
+    }
+
+    if (!clickFxEl) return;
+    sparkTick += 1;
+    if (sparkTick % 3 !== 0) return;
+
+    const spark = document.createElement('span');
+    spark.className = 'cursor-spark';
+    spark.style.left = `${e.clientX + (Math.random() * 10 - 5)}px`;
+    spark.style.top = `${e.clientY + (Math.random() * 10 - 5)}px`;
+    clickFxEl.appendChild(spark);
+    setTimeout(() => spark.remove(), 560);
   });
 } else if (cursorGlow) {
   cursorGlow.style.display = 'none';
