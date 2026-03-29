@@ -1,0 +1,447 @@
+# Instincts generated from https://github.com/chaman2003/chaman2003.github.io
+# Generated: 2026-03-29T04:40:35.039Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: chaman2003.github.io-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Commit Length
+
+## Action
+
+Write moderate-length commit messages (~65 characters)
+
+## Evidence
+
+- Average commit message length: 65 chars
+- Based on 12 commits
+
+---
+id: chaman2003.github.io-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: chaman2003.github.io-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: chaman2003.github.io-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: chaman2003.github.io-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: chaman2003.github.io-workflow-feature-implementation-with-style-and-logic
+trigger: "when doing feature implementation with style and logic"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Workflow Feature Implementation With Style And Logic
+
+## Action
+
+Follow the feature-implementation-with-style-and-logic workflow:
+1. Edit or add new elements to index.html to reflect new structure or content.
+2. Update script.js to add or modify interactive logic related to the feature.
+3. Update styles.css to style the new or changed elements and interactions.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~4x per month
+- Files: index.html, script.js, styles.css
+
+---
+id: chaman2003.github.io-workflow-ui-layout-or-style-polish
+trigger: "when doing ui layout or style polish"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Workflow Ui Layout Or Style Polish
+
+## Action
+
+Follow the ui-layout-or-style-polish workflow:
+1. Edit index.html to adjust structure or classes for layout.
+2. Update styles.css to refine spacing, colors, or responsive behavior.
+3. Optionally, tweak script.js if minor logic is needed for the layout.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: index.html, styles.css
+
+---
+id: chaman2003.github.io-workflow-logic-and-style-tweak
+trigger: "when doing logic and style tweak"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Workflow Logic And Style Tweak
+
+## Action
+
+Follow the logic-and-style-tweak workflow:
+1. Update script.js to fix or enhance logic.
+2. Update styles.css to match new or fixed behaviors.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: script.js, styles.css
+
+---
+id: chaman2003.github.io-instinct-camelCase-files
+trigger: "When creating or renaming a JavaScript file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct CamelCase Files
+
+## Action
+
+Name the file using camelCase (e.g., myFile.js)
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.files
+
+---
+id: chaman2003.github.io-instinct-camelCase-functions
+trigger: "When defining a function"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct CamelCase Functions
+
+## Action
+
+Use camelCase for function names (e.g., handleClick)
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.functions
+
+---
+id: chaman2003.github.io-instinct-pascalCase-classes
+trigger: "When defining a class"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct PascalCase Classes
+
+## Action
+
+Use PascalCase for class names (e.g., PortfolioItem)
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.classes
+
+---
+id: chaman2003.github.io-instinct-screaming-snake-constants
+trigger: "When declaring a constant"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Screaming Snake Constants
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for constant names (e.g., MAX_ITEMS)
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.constants
+
+---
+id: chaman2003.github.io-instinct-relative-imports
+trigger: "When importing modules"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Relative Imports
+
+## Action
+
+Use relative import paths (e.g., import x from './module')
+
+## Evidence
+
+- Pattern in codeStyle.importStyle
+
+---
+id: chaman2003.github.io-instinct-named-exports
+trigger: "When exporting functions or variables"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Named Exports
+
+## Action
+
+Use named exports (e.g., export { myFunc })
+
+## Evidence
+
+- Pattern in codeStyle.exportStyle
+
+---
+id: chaman2003.github.io-instinct-try-catch-error-handling
+trigger: "When handling potential errors in JavaScript"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Try Catch Error Handling
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Pattern in errorHandling.style
+
+---
+id: chaman2003.github.io-instinct-commit-freeform
+trigger: "When writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Commit Freeform
+
+## Action
+
+Use a concise, freeform message describing the change (no enforced prefix)
+
+## Evidence
+
+- Seen in commit: 'Remove header Command Deck and Live v1 controls'
+- Pattern in commits.examples
+
+---
+id: chaman2003.github.io-instinct-commit-length
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Commit Length
+
+## Action
+
+Keep the commit message around 65 characters on average
+
+## Evidence
+
+- Pattern in commits.averageLength
+
+---
+id: chaman2003.github.io-instinct-feature-implementation-workflow
+trigger: "When adding a significant new feature or overhauling a section"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Feature Implementation Workflow
+
+## Action
+
+Edit or add new elements to index.html, update script.js for logic, and update styles.css for styling
+
+## Evidence
+
+- Workflow: feature-implementation-with-style-and-logic
+- Commits: 'Add GSAP animation system and dark/light theme toggle'
+
+---
+id: chaman2003.github.io-instinct-ui-polish-workflow
+trigger: "When refining the UI layout, spacing, or visual consistency"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Ui Polish Workflow
+
+## Action
+
+Edit index.html and styles.css; optionally tweak script.js for minor logic
+
+## Evidence
+
+- Workflow: ui-layout-or-style-polish
+- Commits: 'Refine portfolio to a more professional and polished visual style'
+
+---
+id: chaman2003.github.io-instinct-logic-style-tweak-workflow
+trigger: "When fixing a bug or enhancing an existing feature's behavior and appearance"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Logic Style Tweak Workflow
+
+## Action
+
+Update script.js to fix/enhance logic and styles.css to match new/fixed behaviors
+
+## Evidence
+
+- Workflow: logic-and-style-tweak
+- Commits: 'Fix theme contrast issues and make ticker infinite with theme-aware colors'
+
+---
+id: chaman2003.github.io-instinct-testing-location
+trigger: "When adding or updating tests"
+confidence: 0.7
+domain: testing
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Testing Location
+
+## Action
+
+Place tests in a separate folder from source code
+
+## Evidence
+
+- Pattern in architecture.folderStructure.testLocation
+
+---
+id: chaman2003.github.io-instinct-testing-pattern-absent
+trigger: "When writing tests"
+confidence: 0.3
+domain: testing
+source: repo-analysis
+source_repo: chaman2003/chaman2003.github.io
+---
+
+# Chaman2003.github.io Instinct Testing Pattern Absent
+
+## Action
+
+No consistent test-writing pattern detected; consult project lead for guidance
+
+## Evidence
+
+- No explicit test patterns or examples found in analysis
+
