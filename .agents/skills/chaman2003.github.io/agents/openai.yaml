@@ -1,0 +1,6 @@
+interface:
+  display_name: "Chaman2003.github.io"
+  short_description: "Repo-specific patterns and workflows for chaman2003.github.io"
+  default_prompt: "Use the chaman2003.github.io repo skill to follow existing architecture, testing, and workflow conventions."
+policy:
+  allow_implicit_invocation: true
