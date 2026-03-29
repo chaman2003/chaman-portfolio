@@ -516,15 +516,29 @@ body[data-theme="light"] .fetch-terminal {
 .fetch-body {
   margin: 0;
   padding: 0.68rem 0.66rem;
-  white-space: pre;
+  display: grid;
+  grid-template-columns: minmax(130px, 0.8fr) 1.2fr;
+  gap: 0.7rem;
+  align-items: start;
   overflow: auto;
+}
+
+.fetch-logo,
+.fetch-info {
+  margin: 0;
+  white-space: pre;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.77rem;
+  font-size: 0.76rem;
   line-height: 1.42;
   color: #d6e7ff;
 }
 
-body[data-theme="light"] .fetch-body {
+.fetch-logo {
+  color: #7db2ff;
+}
+
+body[data-theme="light"] .fetch-logo,
+body[data-theme="light"] .fetch-info {
   color: #14386b;
 }
 
@@ -850,7 +864,7 @@ body.gh-packed .github-cards {
 
 .lab-grid {
   display: grid;
-  grid-template-columns: 0.95fr 1.25fr 0.9fr;
+  grid-template-columns: 0.95fr 1.25fr;
   gap: 0.7rem;
   align-items: stretch;
 }
@@ -862,8 +876,7 @@ body.gh-packed .github-cards {
   background: var(--surface-soft);
 }
 
-.lab-controls h4,
-.lab-telemetry h4 {
+.lab-controls h4 {
   margin: 0 0 0.45rem;
 }
 
@@ -890,38 +903,6 @@ body.gh-packed .github-cards {
   transform: translateY(-2px);
   box-shadow: 0 0 14px 0 var(--neon-glow);
   background: rgba(79, 163, 255, 0.18);
-}
-
-.lab-history-wrap {
-  margin-top: 0.65rem;
-}
-
-.lab-meta-title {
-  margin: 0 0 0.35rem;
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
-.lab-history {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.3rem;
-}
-
-.lab-history li {
-  font-family: "JetBrains Mono", Consolas, monospace;
-  font-size: 0.76rem;
-  padding: 0.34rem 0.45rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
-  cursor: pointer;
-}
-
-.lab-history li:hover {
-  border-color: var(--primary);
 }
 
 .lab-console-wrap {
@@ -1031,84 +1012,6 @@ body[data-theme="light"] .lab-console {
   font-size: 0.76rem;
 }
 
-.lab-telemetry {
-  display: grid;
-  align-content: start;
-  gap: 0.55rem;
-}
-
-.meter-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 0.45rem;
-  align-items: center;
-}
-
-.meter-row label {
-  font-size: 0.74rem;
-  color: var(--muted);
-}
-
-.meter-track {
-  height: 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-
-.meter-fill {
-  height: 100%;
-  width: 40%;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  border-radius: 999px;
-  transition: width 0.45s ease;
-}
-
-.meter-row span {
-  font-size: 0.74rem;
-  color: var(--text);
-}
-
-.cube-stage {
-  margin-top: 0.25rem;
-  height: 120px;
-  display: grid;
-  place-items: center;
-  perspective: 650px;
-}
-
-.cube {
-  width: 58px;
-  height: 58px;
-  position: relative;
-  transform-style: preserve-3d;
-  animation: cube-spin 9s linear infinite;
-}
-
-.face {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgba(79, 163, 255, 0.14);
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.f1 { transform: translateZ(29px); }
-.f2 { transform: rotateY(180deg) translateZ(29px); }
-.f3 { transform: rotateY(90deg) translateZ(29px); }
-.f4 { transform: rotateY(-90deg) translateZ(29px); }
-.f5 { transform: rotateX(90deg) translateZ(29px); }
-.f6 { transform: rotateX(-90deg) translateZ(29px); }
-
-@keyframes cube-spin {
-  from { transform: rotateX(-18deg) rotateY(0deg); }
-  to { transform: rotateX(-18deg) rotateY(360deg); }
-}
 
 .inline-link { color: var(--primary); text-decoration: none; font-weight: 600; }
 .inline-link:hover { text-decoration: underline; }
@@ -1314,14 +1217,15 @@ footer { text-align: center; color: var(--muted); padding-bottom: 1.6rem; }
   .lab-grid { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 760px) {
+  .fetch-body {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .lab-btn-grid {
     grid-template-columns: 1fr;
-  }
-
-  .meter-row {
-    grid-template-columns: 1fr;
-    gap: 0.2rem;
   }
 }
 

@@ -103,15 +103,16 @@
               <span class="fetch-dots"><i></i><i></i><i></i></span>
               <span>chaman@archlinux:~</span>
             </div>
-            <pre class="fetch-body"><code>                   /\
+            <div class="fetch-body">
+              <pre class="fetch-logo"><code>                   /\
                   /  \
                  /\   \
                 /      \
                /   ,,   \
               /   |  |  -\
-             /_-''    ''-_\
+             /_-''    ''-_\</code></pre>
 
-chaman@archlinux
+              <pre class="fetch-info"><code>chaman@archlinux
 ----------------
 Name       : Chaman S
 Role       : Software Engineer (Full-Stack | MERN | AI Systems)
@@ -119,7 +120,6 @@ Location   : Bengaluru, Karnataka, India
 Phone      : +91 6361005641
 Email      : chaman2003.dev@gmail.com
 
-OS         : Arch Linux style terminal profile
 Education  : B.E AI & ML (CGPA 8.7), VKIT (2022-2026)
 Intern     : Cortex Craft AI (Jan 2026 - Present)
 Intern     : Edunet Foundation (Mar 2025 - Apr 2025)
@@ -132,6 +132,7 @@ Core       : MERN | Flask | LLMs | RAG | MCP
 DevOps     : Docker | Kubernetes | CI/CD | Linux
 Languages  : English | Hindi | Kannada | Telugu
 Status     : Building production-ready AI products 🚀</code></pre>
+            </div>
           </div>
         </aside>
       </section>
@@ -388,7 +389,7 @@ Status     : Building production-ready AI products 🚀</code></pre>
 
       <section id="lab" class="panel glass reveal lab-section">
         <h2>Interactive Lab Console</h2>
-        <p class="muted">Command center mode: query profile data, inspect stack, and simulate workflow telemetry.</p>
+        <p class="muted">Command center mode: query profile data and inspect stack instantly.</p>
 
         <div class="lab-grid">
           <div class="lab-controls glass-sub">
@@ -406,12 +407,6 @@ Status     : Building production-ready AI products 🚀</code></pre>
               <button class="lab-btn" data-lab-cmd="easter">easter.egg</button>
             </div>
 
-            <div class="lab-history-wrap">
-              <p class="lab-meta-title">Recent Commands</p>
-              <ul id="labHistory" class="lab-history">
-                <li>No commands yet.</li>
-              </ul>
-            </div>
           </div>
 
           <div class="lab-console-wrap">
@@ -426,42 +421,6 @@ Status     : Building production-ready AI products 🚀</code></pre>
                 <input id="labInput" name="labInput" type="text" placeholder="Type command (e.g. about, stack, resume, clear)" />
                 <button type="submit" class="lab-run">Run</button>
               </form>
-            </div>
-          </div>
-
-          <div class="lab-telemetry glass-sub">
-            <h4>Realtime Telemetry</h4>
-
-            <div class="meter-row">
-              <label>Creativity</label>
-              <div class="meter-track"><div class="meter-fill" id="meterCreativity"></div></div>
-              <span id="meterCreativityVal">84%</span>
-            </div>
-            <div class="meter-row">
-              <label>Execution</label>
-              <div class="meter-track"><div class="meter-fill" id="meterExecution"></div></div>
-              <span id="meterExecutionVal">91%</span>
-            </div>
-            <div class="meter-row">
-              <label>Optimization</label>
-              <div class="meter-track"><div class="meter-fill" id="meterOptimization"></div></div>
-              <span id="meterOptimizationVal">79%</span>
-            </div>
-            <div class="meter-row">
-              <label>Shipping Speed</label>
-              <div class="meter-track"><div class="meter-fill" id="meterShipping"></div></div>
-              <span id="meterShippingVal">88%</span>
-            </div>
-
-            <div class="cube-stage" aria-hidden="true">
-              <div class="cube" id="labCube">
-                <div class="face f1">AI</div>
-                <div class="face f2">MERN</div>
-                <div class="face f3">RAG</div>
-                <div class="face f4">DEV</div>
-                <div class="face f5">OPS</div>
-                <div class="face f6">SHIP</div>
-              </div>
             </div>
           </div>
         </div>

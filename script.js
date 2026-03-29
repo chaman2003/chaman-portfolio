@@ -12,16 +12,6 @@ const labOutputEl = document.getElementById('labOutput');
 const labButtons = Array.from(document.querySelectorAll('.lab-btn'));
 const labFormEl = document.getElementById('labForm');
 const labInputEl = document.getElementById('labInput');
-const labHistoryEl = document.getElementById('labHistory');
-const labCubeEl = document.getElementById('labCube');
-const meterCreativityEl = document.getElementById('meterCreativity');
-const meterExecutionEl = document.getElementById('meterExecution');
-const meterOptimizationEl = document.getElementById('meterOptimization');
-const meterShippingEl = document.getElementById('meterShipping');
-const meterCreativityValEl = document.getElementById('meterCreativityVal');
-const meterExecutionValEl = document.getElementById('meterExecutionVal');
-const meterOptimizationValEl = document.getElementById('meterOptimizationVal');
-const meterShippingValEl = document.getElementById('meterShippingVal');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -123,23 +113,6 @@ function typeToLab(text) {
   tick();
 }
 
-function renderLabHistory() {
-  if (!labHistoryEl) return;
-  if (!labHistory.length) {
-    labHistoryEl.innerHTML = '<li>No commands yet.</li>';
-    return;
-  }
-
-  labHistoryEl.innerHTML = labHistory
-    .slice(0, 6)
-    .map((cmd) => `<li data-history-cmd="${cmd}">${cmd}</li>`)
-    .join('');
-
-  labHistoryEl.querySelectorAll('[data-history-cmd]').forEach((item) => {
-    item.addEventListener('click', () => executeLabCommand(item.getAttribute('data-history-cmd')));
-  });
-}
-
 function setActiveLabButton(cmd) {
   labButtons.forEach((b) => {
     b.classList.toggle('active', b.getAttribute('data-lab-cmd') === cmd);
@@ -156,7 +129,6 @@ function executeLabCommand(rawCommand, opts = { store: true }) {
     labHistory.unshift(command);
     labHistory = Array.from(new Set(labHistory)).slice(0, 20);
     labHistoryCursor = -1;
-    renderLabHistory();
   }
 
   setActiveLabButton(normalized);
@@ -200,43 +172,6 @@ labInputEl?.addEventListener('keydown', (e) => {
 });
 
 executeLabCommand('help', { store: false });
-
-// Lab telemetry meters
-const meterDefs = [
-  { fill: meterCreativityEl, val: meterCreativityValEl, min: 76, max: 96 },
-  { fill: meterExecutionEl, val: meterExecutionValEl, min: 78, max: 98 },
-  { fill: meterOptimizationEl, val: meterOptimizationValEl, min: 70, max: 92 },
-  { fill: meterShippingEl, val: meterShippingValEl, min: 74, max: 95 }
-];
-
-function updateMeters() {
-  meterDefs.forEach((m) => {
-    if (!m.fill || !m.val) return;
-    const score = Math.floor(Math.random() * (m.max - m.min + 1)) + m.min;
-    m.fill.style.width = `${score}%`;
-    m.val.textContent = `${score}%`;
-  });
-}
-
-updateMeters();
-if (!prefersReducedMotion) {
-  setInterval(updateMeters, 1700);
-}
-
-if (labCubeEl && !prefersReducedMotion) {
-  const stage = labCubeEl.closest('.cube-stage');
-  stage?.addEventListener('mousemove', (e) => {
-    const r = stage.getBoundingClientRect();
-    const rx = ((e.clientY - r.top) / r.height - 0.5) * -28;
-    const ry = ((e.clientX - r.left) / r.width - 0.5) * 28;
-    labCubeEl.style.animation = 'none';
-    labCubeEl.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
-  });
-  stage?.addEventListener('mouseleave', () => {
-    labCubeEl.style.transform = '';
-    labCubeEl.style.animation = '';
-  });
-}
 
 // Scroll progress
 function updateScrollProgress() {
@@ -561,7 +496,7 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
     stagger: 0.12
   });
 
-  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card, .achievement-card, .exp-card, .lab-controls, .lab-console-wrap, .lab-telemetry').forEach((el) => {
+  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card, .achievement-card, .exp-card, .lab-controls, .lab-console-wrap').forEach((el) => {
     gsap.from(el, {
       y: 26,
       opacity: 0,
