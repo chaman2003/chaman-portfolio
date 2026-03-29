@@ -220,6 +220,18 @@ document.querySelectorAll('[data-action]').forEach((btn) => {
 });
 
 // GitHub API data
+const featuredRepoNames = new Set([
+  'epsiloraai',
+  'printchakraai',
+  'printchakra',
+  'peakhive',
+  'tictactoeai'
+]);
+
+function normalizeRepoName(name = '') {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 async function loadGitHubData() {
   try {
     const userRes = await fetch('https://api.github.com/users/chaman2003');
@@ -229,20 +241,33 @@ async function loadGitHubData() {
       ghHeadlineEl.textContent = `${user.public_repos ?? 0} public repos • ${user.followers ?? 0} followers • ${user.location || 'Open to global collaboration'}`;
     }
 
-    const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=8');
+    const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=30');
     const repos = await reposRes.json();
 
     if (!Array.isArray(repos) || !ghCardsEl) return;
 
-    ghCardsEl.innerHTML = repos
-      .slice(0, 8)
+    const curatedRepos = repos
+      .filter((repo) => {
+        const hasDescription = Boolean(repo.description && repo.description.trim());
+        const normalizedName = normalizeRepoName(repo.name);
+        const notInFeatured = !featuredRepoNames.has(normalizedName);
+        return hasDescription && notInFeatured;
+      })
+      .slice(0, 8);
+
+    if (!curatedRepos.length) {
+      ghCardsEl.innerHTML = '<p class="muted">No additional described repositories to show right now.</p>';
+      return;
+    }
+
+    ghCardsEl.innerHTML = curatedRepos
       .map((repo) => {
-        const desc = repo.description || 'No description provided yet.';
+        const desc = repo.description;
         const lang = repo.language || 'Mixed';
         return `
           <article class="repo-card">
             <div class="repo-top">
-              <h4>${repo.name}</h4>
+              <h4><a class="project-link-title" href="${repo.html_url}" target="_blank" rel="noreferrer">${repo.name}</a></h4>
               <a class="inline-link" href="${repo.html_url}" target="_blank" rel="noreferrer">Open</a>
             </div>
             <p>${desc}</p>
