@@ -143,14 +143,6 @@ Languages  : English | Hindi | Kannada | Telugu
 Status     : Building production-ready AI products</code></pre>
             </div>
           </div>
-
-          <div class="snapshot-ai">
-            <div class="snapshot-ai-head">
-              <strong>AI Snapshot (Groq + RAG)</strong>
-              <button id="refreshAiSnapshot" type="button">Generate</button>
-            </div>
-            <p id="aiSnapshotText">Set your Groq API key in Lab section and click Generate.</p>
-          </div>
         </aside>
       </section>
 
@@ -406,14 +398,7 @@ Status     : Building production-ready AI products</code></pre>
 
       <section id="lab" class="panel glass reveal lab-section">
         <h2>Interactive Lab Console</h2>
-        <p class="muted">Ask questions about your profile using Groq + local RAG context (resume + GitHub + LinkedIn).</p>
-
-        <div class="lab-auth-row glass-sub">
-          <input id="groqApiKey" type="password" placeholder="Enter Groq API key (stored in this browser only)" autocomplete="off" />
-          <button id="saveGroqKey" type="button" class="lab-run">Save Key</button>
-          <button id="clearGroqKey" type="button" class="lab-run lab-clear">Clear</button>
-          <span id="groqStatus" class="groq-status">No key set</span>
-        </div>
+        <p class="muted">Command center mode: query profile data and inspect stack instantly.</p>
 
         <div class="lab-grid">
           <div class="lab-controls glass-sub">
@@ -428,10 +413,9 @@ Status     : Building production-ready AI products</code></pre>
               <button class="lab-btn" data-lab-cmd="linkedin">linkedin.peek</button>
               <button class="lab-btn" data-lab-cmd="resume">resume.scan</button>
               <button class="lab-btn" data-lab-cmd="achievements">achievements.top</button>
-              <button class="lab-btn" data-lab-cmd="ai.summary">ai.summary</button>
-              <button class="lab-btn" data-lab-cmd="ai.projects">ai.projects</button>
-              <button class="lab-btn" data-lab-cmd="ai.skills">ai.skills</button>
+              <button class="lab-btn" data-lab-cmd="easter">easter.egg</button>
             </div>
+
           </div>
 
           <div class="lab-console-wrap">
@@ -440,10 +424,10 @@ Status     : Building production-ready AI products</code></pre>
                 <span>vrik@chaman:~$ interactive-shell</span>
                 <span class="lab-dot"></span>
               </div>
-              <pre id="labOutput">Type "help" or use quick command chips.</pre>
+              <pre id="labOutput">Type "help" or press any command chip to begin.</pre>
               <form id="labForm" class="lab-input-row" autocomplete="off">
                 <span class="lab-prompt">❯</span>
-                <input id="labInput" name="labInput" type="text" placeholder="Try: ask summarize my internships" />
+                <input id="labInput" name="labInput" type="text" placeholder="Type command (e.g. about, stack, resume, clear)" />
                 <button type="submit" class="lab-run">Run</button>
               </form>
             </div>
