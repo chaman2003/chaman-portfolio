@@ -12,6 +12,12 @@ const labOutputEl = document.getElementById('labOutput');
 const labButtons = Array.from(document.querySelectorAll('.lab-btn'));
 const labFormEl = document.getElementById('labForm');
 const labInputEl = document.getElementById('labInput');
+const groqApiKeyEl = document.getElementById('groqApiKey');
+const saveGroqKeyEl = document.getElementById('saveGroqKey');
+const clearGroqKeyEl = document.getElementById('clearGroqKey');
+const groqStatusEl = document.getElementById('groqStatus');
+const refreshAiSnapshotEl = document.getElementById('refreshAiSnapshot');
+const aiSnapshotTextEl = document.getElementById('aiSnapshotText');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -64,9 +70,9 @@ if ('IntersectionObserver' in window) {
   sectionMap.forEach((s) => navObserver.observe(s.target));
 }
 
-// Lab console commands
+// Lab console commands (Groq + lightweight RAG)
 const labResponses = {
-  help: `Available commands:\n- help\n- about\n- stack\n- focus\n- contact\n- github\n- linkedin\n- resume\n- achievements\n- languages\n- clear\n- easter`,
+  help: `Available commands:\n- help\n- about\n- stack\n- focus\n- contact\n- github\n- linkedin\n- resume\n- achievements\n- languages\n- ai.summary\n- ai.projects\n- ai.skills\n- ask <question>\n- clear\n- easter`,
   about: `Chaman S\nSoftware Engineer (Full-Stack | MERN | AI Systems)\nAI & ML Undergraduate (B.E, CGPA 8.7)\nBengaluru, Karnataka`,
   stack: `Core Stack:\n- React, TypeScript, Node.js, Express\n- Python, Flask, Socket.IO\n- MongoDB, PostgreSQL, Supabase\n- LLMs, RAG, LangChain, MCP\n- Docker, Kubernetes, CI/CD`,
   focus: `Current Focus:\n- AI-first full-stack systems\n- Voice + OCR workflows\n- Secure, scalable architecture\n- Production-ready deployment`,
@@ -90,8 +96,133 @@ const labAliases = {
   'achievements.top': 'achievements'
 };
 
+const resumeRagChunks = [
+  'Professional summary: AI & ML undergraduate and full-stack developer specializing in AI-driven systems and real-time applications. Experienced in MERN and Python solutions with LLM, STT, and TTS workflows.',
+  'Education: B.E in Artificial Intelligence and Machine Learning at Vivekananda Institute of Technology, Bengaluru (Dec 2022 - Jun 2026), CGPA 8.7.',
+  'Internship: Cortex Craft AI (Jan 2026 - Present) building AI-first POCs, production-ready prototypes, LLM integration, agentic/RAG workflows, secure APIs, and scalable systems.',
+  'Internship: Edunet Foundation (Mar 2025 - Apr 2025) built PeakHive MERN e-commerce platform; improved engagement by 50% and reduced order processing errors by 20%.',
+  'Projects: Epsilora AI (AI LMS with quiz generation and analytics), PrintChakra AI (voice + OCR + Socket.IO + Whisper + CUDA), PeakHive (MERN e-commerce), Tic Tac Toe AI.',
+  'Achievements: ₹4,500 sponsorship for PrintChakra AI final year project; 1st rank in 3rd and 6th semester (AI & ML, VKIT); SCIMAGINATION 2K23 and 2K25 2nd place.',
+  'Skills: React, TypeScript, Node.js, Express, Python, Flask, MongoDB, PostgreSQL, Docker, Kubernetes, CI/CD, LangChain, MCP, RAG, LLM orchestration.'
+];
+
+const linkedinRagChunks = [
+  'LinkedIn profile: linkedin.com/in/chaman2003 — Software Engineer (Full-Stack | MERN | AI Systems), open to internships, collaborations, and product engineering roles.',
+  'Professional focus from LinkedIn and portfolio: practical AI integration, scalable architecture, low-latency products, and user-centric UX.'
+];
+
+let githubRagChunks = [];
+let githubProfileChunk = '';
 let labHistory = [];
 let labHistoryCursor = -1;
+let labBusy = false;
+
+function getGroqKey() {
+  return (localStorage.getItem('groq_api_key') || '').trim();
+}
+
+function maskKey(key) {
+  if (!key) return 'No key set';
+  if (key.length < 10) return 'Key set';
+  return `Key set (${key.slice(0, 4)}••••${key.slice(-4)})`;
+}
+
+function updateGroqStatus() {
+  if (!groqStatusEl) return;
+  groqStatusEl.textContent = maskKey(getGroqKey());
+}
+
+saveGroqKeyEl?.addEventListener('click', () => {
+  const key = (groqApiKeyEl?.value || '').trim();
+  if (!key) {
+    updateGroqStatus();
+    return;
+  }
+  localStorage.setItem('groq_api_key', key);
+  if (groqApiKeyEl) groqApiKeyEl.value = '';
+  updateGroqStatus();
+});
+
+clearGroqKeyEl?.addEventListener('click', () => {
+  localStorage.removeItem('groq_api_key');
+  if (groqApiKeyEl) groqApiKeyEl.value = '';
+  updateGroqStatus();
+});
+
+updateGroqStatus();
+
+function tokenize(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9+.#\s]/g, ' ')
+    .split(/\s+/)
+    .filter((t) => t.length > 2);
+}
+
+function getRagDocuments() {
+  return [
+    ...resumeRagChunks,
+    ...linkedinRagChunks,
+    githubProfileChunk,
+    ...githubRagChunks
+  ].filter(Boolean);
+}
+
+function retrieveRagContext(query, topK = 5) {
+  const docs = getRagDocuments();
+  const qTokens = tokenize(query);
+  const scored = docs.map((doc) => {
+    const low = doc.toLowerCase();
+    let score = 0;
+    qTokens.forEach((t) => {
+      if (low.includes(t)) score += t.length >= 6 ? 2 : 1;
+    });
+    return { doc, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  const best = scored.filter((s) => s.score > 0).slice(0, topK).map((s) => s.doc);
+  if (best.length) return best;
+  return docs.slice(0, topK);
+}
+
+async function callGroqWithRag(query, { short = false } = {}) {
+  const key = getGroqKey();
+  if (!key) {
+    throw new Error('No Groq API key set. Add it in Lab section first.');
+  }
+
+  const contextChunks = retrieveRagContext(query, 6);
+  const systemPrompt = 'You are an assistant generating concise professional answers for a portfolio terminal. Use only provided context and avoid hallucinations.';
+  const userPrompt = `Question: ${query}\n\nContext:\n${contextChunks.join('\n\n')}`;
+
+  const payload = {
+    model: 'llama-3.3-70b-versatile',
+    temperature: 0.3,
+    max_tokens: short ? 180 : 420,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ]
+  };
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Groq request failed (${res.status}): ${txt.slice(0, 180)}`);
+  }
+
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content?.trim() || 'No response from Groq.';
+}
 
 function typeToLab(text) {
   if (!labOutputEl) return;
@@ -106,9 +237,7 @@ function typeToLab(text) {
     idx += Math.max(1, Math.floor(text.length / 120));
     labOutputEl.textContent = text.slice(0, idx);
     labOutputEl.scrollTop = labOutputEl.scrollHeight;
-    if (idx < text.length) {
-      requestAnimationFrame(tick);
-    }
+    if (idx < text.length) requestAnimationFrame(tick);
   };
   tick();
 }
@@ -119,11 +248,12 @@ function setActiveLabButton(cmd) {
   });
 }
 
-function executeLabCommand(rawCommand, opts = { store: true }) {
-  const command = String(rawCommand || '').trim().toLowerCase();
-  if (!command) return;
+async function executeLabCommand(rawCommand, opts = { store: true }) {
+  const command = String(rawCommand || '').trim();
+  if (!command || labBusy) return;
 
-  const normalized = labAliases[command] || command;
+  const lower = command.toLowerCase();
+  const normalized = labAliases[lower] || lower;
 
   if (opts.store !== false && normalized !== 'clear') {
     labHistory.unshift(command);
@@ -138,16 +268,40 @@ function executeLabCommand(rawCommand, opts = { store: true }) {
     return;
   }
 
+  const aiPreset = {
+    'ai.summary': 'Give a concise professional summary of Chaman S in 5 bullet points.',
+    'ai.projects': 'Summarize the most impactful projects and what makes them technically strong.',
+    'ai.skills': 'List top skills grouped by frontend, backend, AI, and DevOps with short impact notes.'
+  };
+
+  let aiQuery = null;
+  if (lower.startsWith('ask ')) {
+    aiQuery = command.slice(4).trim();
+  } else if (aiPreset[normalized]) {
+    aiQuery = aiPreset[normalized];
+  }
+
+  if (aiQuery) {
+    try {
+      labBusy = true;
+      typeToLab(`> ${command}\n\nThinking with Groq + RAG...`);
+      const answer = await callGroqWithRag(aiQuery);
+      typeToLab(`> ${command}\n\n${answer}`);
+    } catch (err) {
+      typeToLab(`> ${command}\n\n${err.message}`);
+    } finally {
+      labBusy = false;
+    }
+    return;
+  }
+
   const response = labResponses[normalized] || `Unknown command: ${command}\nRun 'help' for available commands.`;
   typeToLab(`> ${command}\n\n${response}`);
 }
 
 if (labButtons.length) {
   labButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const cmd = btn.getAttribute('data-lab-cmd');
-      executeLabCommand(cmd);
-    });
+    btn.addEventListener('click', () => executeLabCommand(btn.getAttribute('data-lab-cmd')));
   });
 }
 
@@ -172,6 +326,19 @@ labInputEl?.addEventListener('keydown', (e) => {
 });
 
 executeLabCommand('help', { store: false });
+
+async function refreshAiSnapshot() {
+  if (!aiSnapshotTextEl) return;
+  try {
+    aiSnapshotTextEl.textContent = 'Generating snapshot...';
+    const answer = await callGroqWithRag('Generate a crisp 3-line professional snapshot for portfolio hero panel.', { short: true });
+    aiSnapshotTextEl.textContent = answer;
+  } catch (err) {
+    aiSnapshotTextEl.textContent = err.message;
+  }
+}
+
+refreshAiSnapshotEl?.addEventListener('click', refreshAiSnapshot);
 
 // Scroll progress
 function updateScrollProgress() {
@@ -387,10 +554,17 @@ async function loadGitHubData() {
       ghHeadlineEl.textContent = `${user.public_repos ?? 0} public repos • ${user.followers ?? 0} followers • ${user.location || 'Open to global collaboration'}`;
     }
 
+    githubProfileChunk = `GitHub profile ${user?.login || 'chaman2003'}: ${user?.public_repos ?? 0} public repos, ${user?.followers ?? 0} followers, location ${user?.location || 'not specified'}, bio: ${user?.bio || 'N/A'}.`;
+
     const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=30');
     const repos = await reposRes.json();
 
     if (!Array.isArray(repos) || !ghCardsEl) return;
+
+    githubRagChunks = repos
+      .filter((r) => r.description && r.description.trim())
+      .slice(0, 18)
+      .map((r) => `Repo ${r.name}: ${r.description}. Language: ${r.language || 'Mixed'}. Stars: ${r.stargazers_count}.`);
 
     const ghCols = getGithubCols();
     const targetCards = ghCols * 2;
@@ -496,7 +670,7 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
     stagger: 0.12
   });
 
-  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card, .achievement-card, .exp-card, .lab-controls, .lab-console-wrap').forEach((el) => {
+  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card, .achievement-card, .exp-card, .lab-auth-row, .lab-controls, .lab-console-wrap, .snapshot-ai').forEach((el) => {
     gsap.from(el, {
       y: 26,
       opacity: 0,
