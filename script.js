@@ -174,51 +174,6 @@ if (!prefersReducedMotion) {
   });
 }
 
-// Command deck modal
-const deckEl = document.getElementById('commandDeck');
-const deckOpenBtn = document.getElementById('commandDeckOpen');
-const deckCloseBtn = document.getElementById('commandDeckClose');
-
-function openDeck() {
-  if (!deckEl) return;
-  deckEl.classList.add('active');
-  deckEl.setAttribute('aria-hidden', 'false');
-}
-
-function closeDeck() {
-  if (!deckEl) return;
-  deckEl.classList.remove('active');
-  deckEl.setAttribute('aria-hidden', 'true');
-}
-
-deckOpenBtn?.addEventListener('click', openDeck);
-deckCloseBtn?.addEventListener('click', closeDeck);
-deckEl?.addEventListener('click', (e) => {
-  if (e.target === deckEl) closeDeck();
-});
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeDeck();
-  if (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey)) {
-    e.preventDefault();
-    openDeck();
-  }
-});
-
-const commandMap = {
-  github: 'https://github.com/chaman2003',
-  leetcode: 'https://leetcode.com/chaman_2003/',
-  linkedin: 'https://linkedin.com/in/chaman2003',
-  mail: 'mailto:chamans7952@gmail.com'
-};
-
-document.querySelectorAll('[data-action]').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const action = btn.getAttribute('data-action');
-    const url = commandMap[action];
-    if (url) window.open(url, '_blank', 'noopener,noreferrer');
-  });
-});
-
 // GitHub API data
 const featuredRepoNames = new Set([
   'epsiloraai',
