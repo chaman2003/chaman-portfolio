@@ -361,15 +361,6 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
     ease: 'power3.out'
   });
 
-  gsap.from('.emoji-burst span', {
-    scale: 0,
-    opacity: 0,
-    rotate: -30,
-    duration: 0.5,
-    stagger: 0.07,
-    ease: 'back.out(2)'
-  });
-
   gsap.to('.logo-pill', {
     y: -4,
     duration: 1.6,

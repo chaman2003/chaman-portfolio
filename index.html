@@ -43,6 +43,7 @@
         <a href="#projects">Projects</a>
         <a href="#profiles">Profiles</a>
         <a href="#timeline">Timeline</a>
+        <a href="#lab">Lab</a>
         <a href="#contact">Contact</a>
       </nav>
 
@@ -71,10 +72,6 @@
             <span>🤖 AI Systems</span>
             <span>⚡ Full-Stack</span>
             <span>🌍 Open Source</span>
-          </div>
-
-          <div class="emoji-burst" aria-label="vibe">
-            <span>⚡</span><span>🚀</span><span>🤖</span><span>💡</span><span>🧠</span><span>✨</span>
           </div>
 
           <div class="type-line">
@@ -328,6 +325,30 @@
           <article class="skill-logo-card"><i class="devicon-mongodb-plain"></i><span>MongoDB</span></article>
           <article class="skill-logo-card"><i class="devicon-postgresql-plain"></i><span>PostgreSQL</span></article>
           <article class="skill-logo-card"><i class="devicon-docker-plain"></i><span>Docker</span></article>
+        </div>
+      </section>
+
+      <section id="lab" class="panel glass reveal lab-section">
+        <h2>Interactive Lab Console</h2>
+        <p class="muted">Quick command-style profile explorer.</p>
+
+        <div class="lab-grid">
+          <div class="lab-controls">
+            <button class="lab-btn" data-lab-cmd="about">about.me</button>
+            <button class="lab-btn" data-lab-cmd="stack">stack.list</button>
+            <button class="lab-btn" data-lab-cmd="focus">focus.now</button>
+            <button class="lab-btn" data-lab-cmd="contact">contact.info</button>
+            <button class="lab-btn" data-lab-cmd="github">github.peek</button>
+            <button class="lab-btn" data-lab-cmd="easter">easter.egg</button>
+          </div>
+
+          <div class="lab-console" id="labConsole" role="status" aria-live="polite">
+            <div class="lab-console-head">
+              <span>vrik@chaman:~$</span>
+              <span class="lab-dot"></span>
+            </div>
+            <pre id="labOutput">Run a command to explore profile quickly.</pre>
+          </div>
         </div>
       </section>
 
