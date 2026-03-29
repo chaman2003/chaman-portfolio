@@ -347,6 +347,21 @@ h1 span {
   margin: 0 0 0.45rem;
 }
 
+.quick-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 0.32rem;
+}
+
+.quick-meta span {
+  font-size: 0.78rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.22rem 0.55rem;
+  background: var(--surface-soft);
+}
+
 .floating-tags {
   display: flex;
   flex-wrap: wrap;
@@ -527,7 +542,7 @@ h1 span {
 
 @keyframes ticker-loop {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to { transform: translateX(calc(-1 * var(--loop-shift, 50%))); }
 }
 
 .logo-marquee-wrap {
@@ -569,7 +584,7 @@ h1 span {
 
 @keyframes logo-loop {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to { transform: translateX(calc(-1 * var(--loop-shift, 50%))); }
 }
 
 .stats {
@@ -617,6 +632,44 @@ section { margin-top: 0.8rem; }
 
 .about-grid {
   margin-top: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.65rem;
+}
+
+.exp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.7rem;
+}
+
+.exp-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: var(--surface-soft);
+}
+
+.exp-card h4 {
+  margin: 0 0 0.35rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.exp-card h4 span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.exp-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.edu-cert-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 0.65rem;

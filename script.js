@@ -8,6 +8,8 @@ const themeToggleBtn = document.getElementById('themeToggle');
 const logoMarqueeEl = document.getElementById('logoMarquee');
 const clickFxEl = document.getElementById('clickFx');
 const backToTopBtn = document.getElementById('backToTop');
+const labOutputEl = document.getElementById('labOutput');
+const labButtons = Array.from(document.querySelectorAll('.lab-btn'));
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -58,6 +60,28 @@ if ('IntersectionObserver' in window) {
   );
 
   sectionMap.forEach((s) => navObserver.observe(s.target));
+}
+
+// Lab console commands
+const labResponses = {
+  about: `Chaman S\nSoftware Engineer (Full-Stack | MERN | AI Systems)\nAI & ML Undergraduate (B.E, CGPA 8.7)\nBengaluru, Karnataka`,
+  stack: `Core Stack:\n- React, TypeScript, Node.js, Express\n- Python, Flask, Socket.IO\n- MongoDB, PostgreSQL, Supabase\n- LLMs, RAG, LangChain, MCP\n- Docker, Kubernetes, CI/CD`,
+  focus: `Current Focus:\n- AI-first full-stack systems\n- Voice + OCR workflows\n- Reliable low-latency product engineering\n- Production-ready architecture`,
+  contact: `Contact:\nEmail: chaman2003.dev@gmail.com\nPhone: +91 6361005641\nLinkedIn: linkedin.com/in/chaman2003\nGitHub: github.com/chaman2003`,
+  github: `GitHub Snapshot:\n- Open source repositories in AI + MERN\n- Featured: Epsilora AI, PrintChakra AI, PeakHive\n- Username: @chaman2003`,
+  easter: `⚡ Vrik console unlocked:\nBuild. Break. Learn. Repeat. 🚀`
+};
+
+if (labOutputEl && labButtons.length) {
+  labButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cmd = btn.getAttribute('data-lab-cmd');
+      const output = labResponses[cmd] || 'Unknown command';
+      labButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      labOutputEl.textContent = `> ${cmd}\n\n${output}`;
+    });
+  });
 }
 
 // Scroll progress
@@ -333,6 +357,13 @@ let githubReloadTimer;
 window.addEventListener('resize', () => {
   clearTimeout(githubReloadTimer);
   githubReloadTimer = setTimeout(loadGitHubData, 180);
+
+  if (tickerTrack?.dataset.loopReady === '1') {
+    tickerTrack.style.setProperty('--loop-shift', `${tickerTrack.scrollWidth / 2}px`);
+  }
+  if (logoMarqueeEl?.dataset.loopReady === '1') {
+    logoMarqueeEl.style.setProperty('--loop-shift', `${logoMarqueeEl.scrollWidth / 2}px`);
+  }
 });
 
 // GSAP premium animations
@@ -385,8 +416,23 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
   });
 }
 
-// keep marquees smooth if user switches tab/visibility
+function setupInfiniteMarquee(trackEl) {
+  if (!trackEl || trackEl.dataset.loopReady === '1') return;
+  const base = trackEl.innerHTML;
+  trackEl.innerHTML = `${base}${base}`;
+  trackEl.dataset.loopReady = '1';
+
+  requestAnimationFrame(() => {
+    const shift = trackEl.scrollWidth / 2;
+    trackEl.style.setProperty('--loop-shift', `${shift}px`);
+  });
+}
+
 const tickerTrack = document.getElementById('tickerTrack');
+setupInfiniteMarquee(tickerTrack);
+setupInfiniteMarquee(logoMarqueeEl);
+
+// keep marquees smooth if user switches tab/visibility
 document.addEventListener('visibilitychange', () => {
   const playState = document.hidden ? 'paused' : 'running';
   if (tickerTrack) tickerTrack.style.animationPlayState = playState;
