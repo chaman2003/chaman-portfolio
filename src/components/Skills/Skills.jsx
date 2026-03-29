@@ -5,7 +5,6 @@ export default function Skills() {
   return (
     <section id="skills" className="panel">
       <h2>Tech Arsenal</h2>
-
       <div className="main-skill-grid">
         {MAIN_SKILLS.map((skill) => (
           <article key={skill.title} className="main-skill-card">

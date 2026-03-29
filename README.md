@@ -1,78 +1,54 @@
-# Chaman S — Portfolio Website
+# Chaman Portfolio (React + Vite)
 
-A modern, responsive portfolio website for **Chaman S** focused on clean presentation, strong accessibility, and smooth interactions.
+Simple React portfolio codebase with component folders (`jsx + css` together).
 
-## Live Site
+## Stack
+- React 18
+- Vite
+- Vercel-ready config
 
-- **GitHub Pages:** https://chaman2003.github.io/
+## Project structure
 
-## Highlights
-
-- Professional, responsive layout (desktop/tablet/mobile)
-- Dark/Light theme toggle with preference persistence
-- WCAG-conscious contrast and readable typography
-- Interactive UI polish (subtle motion, hover depth, progress bar)
-- Dynamic GitHub snapshot section (filtered to show:
-  - repos with descriptions only
-  - repos not duplicated in Featured Builds)
-- Sections for About, Featured Builds, Profiles, Timeline, Skills, and Contact
-
-## Tech Stack
-
-- **HTML5**
-- **CSS3**
-- **Vanilla JavaScript**
-- **GSAP + ScrollTrigger** (CDN)
-- **GitHub REST API** (for live repository snapshot)
-
-## Project Structure
-
-```text
-portfolio-futuristic/
-├─ index.html
-├─ styles.css
-├─ script.js
-└─ README.md
+```txt
+src/
+  components/
+    Header/
+    Hero/
+    Sections/
+    Skills/
+    LabConsole/
+  data/
+  utils/
+  styles/
 ```
 
-## Run Locally
+## Environment variables
 
-### Option 1: Python server
+Create `.env` (already prepared locally) with:
+
+```env
+VITE_GROQ_API_KEY=...
+VITE_GROQ_MODEL=llama-3.3-70b-versatile
+VITE_GITHUB_USERNAME=chaman2003
+```
+
+## Run
 
 ```bash
-cd portfolio-futuristic
-python -m http.server 8080
+npm install
+npm run dev
 ```
 
-Open: `http://localhost:8080`
+## Build
 
-### Option 2: VS Code Live Server
+```bash
+npm run build
+```
 
-Open the folder and run **Live Server** on `index.html`.
+## Deploy (Vercel)
 
-## Customization
+```bash
+vercel --prod
+```
 
-Update these places for your own profile:
-
-- `index.html`
-  - Name, tagline, project cards, profile links
-- `script.js`
-  - GitHub username in API calls
-  - Featured repo exclusion list
-- `styles.css`
-  - Theme colors and layout tuning
-
-## Deployment
-
-This site is deployed to GitHub Pages via the user-site repository:
-
-- Repository: `chaman2003/chaman2003.github.io`
-- Branch: `main`
-- Path: root (`/`)
-
-## Contact
-
-- GitHub: https://github.com/chaman2003
-- LinkedIn: https://linkedin.com/in/chaman2003
-- LeetCode: https://leetcode.com/chaman_2003/
-- Email: chamans7952@gmail.com
+`vercel.json` is included.
