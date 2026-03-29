@@ -76,7 +76,7 @@ const labResponses = {
   resume: `Resume Highlights:\n- B.E AI & ML (CGPA 8.7)\n- Cortex Craft AI (Jan 2026 - Present)\n- Edunet Foundation (Mar 2025 - Apr 2025)\n- PrintChakra sponsorship ₹4,500`,
   achievements: `Achievements:\n- 1st rank in 3rd and 6th semester (AI & ML, VKIT)\n- SCIMAGINATION 2K23: 2nd place\n- SCIMAGINATION 2K25: 2nd place`,
   languages: `Languages:\nEnglish (Fluent)\nHindi (Fluent)\nKannada (Native)\nTelugu (Conversational)`,
-  easter: `⚡ Vrik console unlocked:\nBuild. Break. Learn. Repeat. Ship. 🚀`
+  easter: `⚡ Vrik console unlocked:\nBuild. Break. Learn. Repeat. Ship.`
 };
 
 const labAliases = {
