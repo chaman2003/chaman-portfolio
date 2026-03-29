@@ -59,6 +59,25 @@ body {
   position: relative;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20% -20%;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(79, 163, 255, 0.16), transparent 35%),
+    radial-gradient(circle at 80% 30%, rgba(111, 129, 255, 0.15), transparent 38%),
+    radial-gradient(circle at 50% 80%, rgba(46, 199, 164, 0.12), transparent 40%);
+  animation: mesh-drift 16s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: -5;
+}
+
+@keyframes mesh-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-2%, 1.5%, 0) scale(1.03); }
+  100% { transform: translate3d(2%, -1.5%, 0) scale(1.05); }
+}
+
 #scrollProgress {
   position: fixed;
   top: 0;
@@ -125,6 +144,10 @@ body[data-theme="light"] .aurora {
   display: none;
 }
 
+body[data-theme="light"]::before {
+  opacity: 0.15;
+}
+
 .cursor-glow {
   width: 260px;
   height: 260px;
@@ -135,6 +158,29 @@ body[data-theme="light"] .aurora {
   top: -999px;
   pointer-events: none;
   z-index: -1;
+}
+
+.click-fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 70;
+}
+
+.click-ring {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: click-burst 0.7s ease-out forwards;
+  box-shadow: 0 0 18px 0 var(--neon-glow);
+}
+
+@keyframes click-burst {
+  from { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(7); }
 }
 
 .glass {
@@ -321,6 +367,46 @@ h1 span {
   grid-template-rows: auto auto 1fr;
 }
 .hero-side h3 { margin: 0 0 0.65rem; }
+
+.orbit-wrap {
+  margin: 0.1rem 0 0.65rem;
+  height: 110px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.orbit {
+  position: absolute;
+  border: 1px solid rgba(130, 177, 255, 0.5);
+  border-radius: 50%;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+}
+
+.orbit-a { width: 44px; height: 44px; animation: spin 5s linear infinite; }
+.orbit-b { width: 72px; height: 72px; animation: spin 8s linear infinite reverse; }
+.orbit-c { width: 98px; height: 98px; animation: spin 12s linear infinite; }
+
+.orbit-core {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  box-shadow: 0 0 22px 0 var(--neon-glow);
+}
+
+@keyframes spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
 
 .hero-extra {
   margin-top: 0.65rem;
@@ -514,6 +600,19 @@ body.gh-packed .github-cards {
 .project {
   position: relative;
   overflow: hidden;
+}
+
+.project-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--primary);
+  margin-bottom: 0.35rem;
 }
 
 .project::before {
@@ -713,6 +812,19 @@ body.gh-packed .github-cards {
 .command-actions button { padding: 0.5rem 0.75rem; border-radius: 10px; }
 
 footer { text-align: center; color: var(--muted); padding-bottom: 1.6rem; }
+
+.project,
+.profile-card,
+.repo-card,
+.skill-logo-card,
+.stat {
+  animation: border-glow 4.5s ease-in-out infinite;
+}
+
+@keyframes border-glow {
+  0%, 100% { box-shadow: var(--shadow); }
+  50% { box-shadow: var(--shadow), 0 0 18px 0 var(--neon-glow); }
+}
 
 .hero,
 .project,

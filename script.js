@@ -6,6 +6,7 @@ const scrollProgressEl = document.getElementById('scrollProgress');
 const heroSceneEl = document.getElementById('heroScene');
 const themeToggleBtn = document.getElementById('themeToggle');
 const logoMarqueeEl = document.getElementById('logoMarquee');
+const clickFxEl = document.getElementById('clickFx');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -125,6 +126,18 @@ if (hasFinePointer && !prefersReducedMotion) {
   });
 } else if (cursorGlow) {
   cursorGlow.style.display = 'none';
+}
+
+// Click burst effect
+if (clickFxEl && !prefersReducedMotion) {
+  window.addEventListener('pointerdown', (e) => {
+    const ring = document.createElement('span');
+    ring.className = 'click-ring';
+    ring.style.left = `${e.clientX}px`;
+    ring.style.top = `${e.clientY}px`;
+    clickFxEl.appendChild(ring);
+    setTimeout(() => ring.remove(), 720);
+  });
 }
 
 // Hero parallax (subtle)
