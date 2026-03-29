@@ -36,17 +36,22 @@ function updateScrollProgress() {
 window.addEventListener('scroll', updateScrollProgress);
 updateScrollProgress();
 
-// Reveal on scroll
+// Reveal on scroll (safe fallback)
 const reveals = document.querySelectorAll('.reveal');
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) entry.target.classList.add('visible');
-    });
-  },
-  { threshold: 0.12 }
-);
-reveals.forEach((el) => revealObserver.observe(el));
+if ('IntersectionObserver' in window) {
+  document.body.classList.add('js-reveal');
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    },
+    { threshold: 0.12 }
+  );
+  reveals.forEach((el) => revealObserver.observe(el));
+} else {
+  reveals.forEach((el) => el.classList.add('visible'));
+}
 
 // Counter animation
 const counters = document.querySelectorAll('[data-counter]');
@@ -250,10 +255,8 @@ async function loadGitHubData() {
 loadGitHubData();
 
 // GSAP premium animations
-if (window.gsap) {
-  if (window.ScrollTrigger) {
-    gsap.registerPlugin(ScrollTrigger);
-  }
+if (window.gsap && window.ScrollTrigger) {
+  gsap.registerPlugin(ScrollTrigger);
 
   gsap.from('.header', {
     y: -24,
@@ -277,22 +280,27 @@ if (window.gsap) {
     ease: 'power3.out'
   });
 
-  if (window.ScrollTrigger) {
-    gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel').forEach((el) => {
-      gsap.from(el, {
-        y: 26,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 85%',
-          toggleActions: 'play none none reverse'
-        }
-      });
+  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel').forEach((el) => {
+    gsap.from(el, {
+      y: 26,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 85%',
+        toggleActions: 'play none none reverse'
+      }
     });
-  }
+  });
 }
+
+// keep ticker smooth if user switches tab/visibility
+const tickerTrack = document.getElementById('tickerTrack');
+document.addEventListener('visibilitychange', () => {
+  if (!tickerTrack) return;
+  tickerTrack.style.animationPlayState = document.hidden ? 'paused' : 'running';
+});
 
 // Starfield background
 const canvas = document.getElementById('starfield');
