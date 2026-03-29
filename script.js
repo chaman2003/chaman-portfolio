@@ -407,7 +407,8 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
       scrollTrigger: {
         trigger: el,
         start: 'top 85%',
-        toggleActions: 'play none none reverse'
+        toggleActions: 'play none none none',
+        once: true
       }
     });
   });
