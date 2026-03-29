@@ -4,8 +4,26 @@ const ghCardsEl = document.getElementById('githubCards');
 const ghHeadlineEl = document.getElementById('ghHeadline');
 const scrollProgressEl = document.getElementById('scrollProgress');
 const heroSceneEl = document.getElementById('heroScene');
+const themeToggleBtn = document.getElementById('themeToggle');
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+// Theme toggle
+const storedTheme = localStorage.getItem('theme');
+if (storedTheme === 'light') {
+  document.body.setAttribute('data-theme', 'light');
+  if (themeToggleBtn) themeToggleBtn.textContent = '☀️ Light';
+}
+
+function toggleTheme() {
+  const current = document.body.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  if (themeToggleBtn) themeToggleBtn.textContent = next === 'dark' ? '🌙 Dark' : '☀️ Light';
+}
+
+themeToggleBtn?.addEventListener('click', toggleTheme);
 
 // Scroll progress
 function updateScrollProgress() {
@@ -230,6 +248,51 @@ async function loadGitHubData() {
   }
 }
 loadGitHubData();
+
+// GSAP premium animations
+if (window.gsap) {
+  if (window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  gsap.from('.header', {
+    y: -24,
+    opacity: 0,
+    duration: 0.8,
+    ease: 'power3.out'
+  });
+
+  gsap.from('.hero-content > *', {
+    y: 24,
+    opacity: 0,
+    duration: 0.8,
+    stagger: 0.08,
+    ease: 'power3.out'
+  });
+
+  gsap.from('.hero-side', {
+    x: 30,
+    opacity: 0,
+    duration: 0.9,
+    ease: 'power3.out'
+  });
+
+  if (window.ScrollTrigger) {
+    gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel').forEach((el) => {
+      gsap.from(el, {
+        y: 26,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+    });
+  }
+}
 
 // Starfield background
 const canvas = document.getElementById('starfield');
