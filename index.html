@@ -98,10 +98,10 @@
         <aside class="hero-side glass">
           <h3>Professional Snapshot</h3>
 
-          <div class="fetch-terminal" role="img" aria-label="Professional terminal snapshot">
+          <div class="fetch-terminal" role="region" aria-label="Professional terminal snapshot">
             <div class="fetch-head">
               <span class="fetch-dots"><i></i><i></i><i></i></span>
-              <span>chaman@archlinux:~</span>
+              <span>chaman@archlinux:~ intelligent-shell</span>
             </div>
             <div class="fetch-body">
               <pre class="fetch-logo"><code>                   -`
@@ -142,6 +142,13 @@ DevOps     : Docker | Kubernetes | CI/CD | Linux
 Languages  : English | Hindi | Kannada | Telugu
 Status     : Building production-ready AI products</code></pre>
             </div>
+            <form id="fetchForm" class="fetch-input-row" autocomplete="off" aria-label="Top terminal input">
+              <label class="sr-only" for="fetchInput">Top terminal command</label>
+              <span class="fetch-prompt">❯</span>
+              <input id="fetchInput" type="text" placeholder="Type here, run below in lab console" />
+              <button type="submit" class="fetch-run">Send</button>
+            </form>
+            <pre id="fetchOutput" class="fetch-output" aria-live="polite">Top terminal is connected to the Interactive Lab below.</pre>
           </div>
         </aside>
       </section>
@@ -413,7 +420,9 @@ Status     : Building production-ready AI products</code></pre>
               <button class="lab-btn" data-lab-cmd="linkedin">linkedin.peek</button>
               <button class="lab-btn" data-lab-cmd="resume">resume.scan</button>
               <button class="lab-btn" data-lab-cmd="achievements">achievements.top</button>
-              <button class="lab-btn" data-lab-cmd="easter">easter.egg</button>
+              <button class="lab-btn" data-lab-cmd="ai.summary">ai.summary</button>
+              <button class="lab-btn" data-lab-cmd="ai.projects">ai.projects</button>
+              <button class="lab-btn" data-lab-cmd="ai.skills">ai.skills</button>
             </div>
 
           </div>
@@ -424,10 +433,11 @@ Status     : Building production-ready AI products</code></pre>
                 <span>vrik@chaman:~$ interactive-shell</span>
                 <span class="lab-dot"></span>
               </div>
-              <pre id="labOutput">Type "help" or press any command chip to begin.</pre>
-              <form id="labForm" class="lab-input-row" autocomplete="off">
+              <pre id="labOutput">Type "help" or ask a question.</pre>
+              <form id="labForm" class="lab-input-row" autocomplete="off" aria-label="Lab terminal input">
+                <label class="sr-only" for="labInput">Lab terminal command</label>
                 <span class="lab-prompt">❯</span>
-                <input id="labInput" name="labInput" type="text" placeholder="Type command (e.g. about, stack, resume, clear)" />
+                <input id="labInput" name="labInput" type="text" placeholder="Try: ask summarize my internships" />
                 <button type="submit" class="lab-run">Run</button>
               </form>
             </div>

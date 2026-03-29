@@ -12,6 +12,9 @@ const labOutputEl = document.getElementById('labOutput');
 const labButtons = Array.from(document.querySelectorAll('.lab-btn'));
 const labFormEl = document.getElementById('labForm');
 const labInputEl = document.getElementById('labInput');
+const fetchFormEl = document.getElementById('fetchForm');
+const fetchInputEl = document.getElementById('fetchInput');
+const fetchOutputEl = document.getElementById('fetchOutput');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -64,19 +67,41 @@ if ('IntersectionObserver' in window) {
   sectionMap.forEach((s) => navObserver.observe(s.target));
 }
 
-// Lab console commands
+// Intelligent terminal commands (Groq + local RAG)
+const GROQ_API_KEY = 'REPLACE_WITH_GROQ_API_KEY';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+
+const resumeRagChunks = [
+  'Professional summary: AI & ML undergraduate and full-stack developer specializing in AI-driven systems and real-time applications. Experienced with MERN and Python solutions integrating LLM, STT, and TTS workflows.',
+  'Education: B.E in AI & ML at Vivekananda Institute of Technology, Bengaluru (Dec 2022 - Jun 2026), CGPA 8.7.',
+  'Internship: Cortex Craft AI (Jan 2026 - Present), building AI-first POCs with LLM integration, agentic/RAG workflows, secure APIs, and scalable architectures.',
+  'Internship: Edunet Foundation (Mar 2025 - Apr 2025), built PeakHive MERN e-commerce platform, improved engagement by 50% and reduced order-processing errors by 20%.',
+  'Projects: Epsilora AI, PrintChakra AI, PeakHive, Tic Tac Toe AI.',
+  'Skills: React, TypeScript, Node.js, Express, Python, Flask, MongoDB, PostgreSQL, LLMs, RAG, LangChain, MCP, Docker, Kubernetes, CI/CD.',
+  'Achievements: ₹4,500 sponsorship for PrintChakra AI, 1st rank in 3rd and 6th semester, SCIMAGINATION 2K23 and 2K25 2nd place.'
+];
+
+const linkedinRagChunks = [
+  'LinkedIn: linkedin.com/in/chaman2003 — Software Engineer (Full-Stack | MERN | AI Systems), open to internships, collaborations, and product engineering roles.'
+];
+
+let githubProfileChunk = '';
+let githubRagChunks = [];
+let labHistory = [];
+let labHistoryCursor = -1;
+let terminalBusy = false;
+
 const labResponses = {
-  help: `Available commands:\n- help\n- about\n- stack\n- focus\n- contact\n- github\n- linkedin\n- resume\n- achievements\n- languages\n- clear\n- easter`,
+  help: `Available commands:\n- help\n- about\n- stack\n- focus\n- contact\n- github\n- linkedin\n- resume\n- achievements\n- languages\n- ai.summary\n- ai.projects\n- ai.skills\n- ask <question>\n- clear`,
   about: `Chaman S\nSoftware Engineer (Full-Stack | MERN | AI Systems)\nAI & ML Undergraduate (B.E, CGPA 8.7)\nBengaluru, Karnataka`,
   stack: `Core Stack:\n- React, TypeScript, Node.js, Express\n- Python, Flask, Socket.IO\n- MongoDB, PostgreSQL, Supabase\n- LLMs, RAG, LangChain, MCP\n- Docker, Kubernetes, CI/CD`,
   focus: `Current Focus:\n- AI-first full-stack systems\n- Voice + OCR workflows\n- Secure, scalable architecture\n- Production-ready deployment`,
   contact: `Contact:\nEmail: chaman2003.dev@gmail.com\nPhone: +91 6361005641\nLinkedIn: linkedin.com/in/chaman2003\nGitHub: github.com/chaman2003`,
-  github: `GitHub Snapshot:\n- Username: @chaman2003\n- Full-stack + AI oriented repositories\n- Fast iteration + polished product mindset`,
+  github: `GitHub Snapshot:\n- Username: @chaman2003\n- Full-stack + AI repositories\n- Fast iteration + polished product mindset`,
   linkedin: `LinkedIn:\n- linkedin.com/in/chaman2003\n- Open to internships, collaborations, product roles`,
   resume: `Resume Highlights:\n- B.E AI & ML (CGPA 8.7)\n- Cortex Craft AI (Jan 2026 - Present)\n- Edunet Foundation (Mar 2025 - Apr 2025)\n- PrintChakra sponsorship ₹4,500`,
   achievements: `Achievements:\n- 1st rank in 3rd and 6th semester (AI & ML, VKIT)\n- SCIMAGINATION 2K23: 2nd place\n- SCIMAGINATION 2K25: 2nd place`,
-  languages: `Languages:\nEnglish (Fluent)\nHindi (Fluent)\nKannada (Native)\nTelugu (Conversational)`,
-  easter: `⚡ Vrik console unlocked:\nBuild. Break. Learn. Repeat. Ship.`
+  languages: `Languages:\nEnglish (Fluent)\nHindi (Fluent)\nKannada (Native)\nTelugu (Conversational)`
 };
 
 const labAliases = {
@@ -90,27 +115,102 @@ const labAliases = {
   'achievements.top': 'achievements'
 };
 
-let labHistory = [];
-let labHistoryCursor = -1;
+function tokenize(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9+.#\s]/g, ' ')
+    .split(/\s+/)
+    .filter((t) => t.length > 2);
+}
 
-function typeToLab(text) {
-  if (!labOutputEl) return;
+function getRagDocuments() {
+  return [...resumeRagChunks, ...linkedinRagChunks, githubProfileChunk, ...githubRagChunks].filter(Boolean);
+}
+
+function retrieveRagContext(query, topK = 6) {
+  const docs = getRagDocuments();
+  if (!docs.length) return [];
+
+  const qTokens = tokenize(query);
+  const scored = docs.map((doc) => {
+    let score = 0;
+    const low = doc.toLowerCase();
+    qTokens.forEach((token) => {
+      if (low.includes(token)) score += token.length > 5 ? 2 : 1;
+    });
+    return { doc, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  const best = scored.filter((d) => d.score > 0).slice(0, topK).map((d) => d.doc);
+  return best.length ? best : docs.slice(0, topK);
+}
+
+async function callGroqWithRag(query, { short = false } = {}) {
+  if (!GROQ_API_KEY || GROQ_API_KEY === 'REPLACE_WITH_GROQ_API_KEY') {
+    throw new Error('Groq API key missing in project config.');
+  }
+
+  const context = retrieveRagContext(query);
+  const payload = {
+    model: GROQ_MODEL,
+    temperature: 0.3,
+    max_tokens: short ? 220 : 450,
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a concise portfolio assistant. Answer using only provided context. Keep responses accurate and professional.'
+      },
+      {
+        role: 'user',
+        content: `Question: ${query}\n\nContext:\n${context.join('\n\n')}`
+      }
+    ]
+  };
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${GROQ_API_KEY}`
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const msg = await res.text();
+    throw new Error(`Groq request failed (${res.status}): ${msg.slice(0, 160)}`);
+  }
+
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content?.trim() || 'No response generated.';
+}
+
+function typeToElement(el, text) {
+  if (!el) return;
   if (prefersReducedMotion) {
-    labOutputEl.textContent = text;
+    el.textContent = text;
     return;
   }
 
-  labOutputEl.textContent = '';
+  el.textContent = '';
   let idx = 0;
   const tick = () => {
     idx += Math.max(1, Math.floor(text.length / 120));
-    labOutputEl.textContent = text.slice(0, idx);
-    labOutputEl.scrollTop = labOutputEl.scrollHeight;
-    if (idx < text.length) {
-      requestAnimationFrame(tick);
-    }
+    el.textContent = text.slice(0, idx);
+    el.scrollTop = el.scrollHeight;
+    if (idx < text.length) requestAnimationFrame(tick);
   };
   tick();
+}
+
+function typeToLab(text) {
+  typeToElement(labOutputEl, text);
+}
+
+function setTopTerminalStatus(text) {
+  if (!fetchOutputEl) return;
+  fetchOutputEl.textContent = text;
 }
 
 function setActiveLabButton(cmd) {
@@ -119,14 +219,15 @@ function setActiveLabButton(cmd) {
   });
 }
 
-function executeLabCommand(rawCommand, opts = { store: true }) {
-  const command = String(rawCommand || '').trim().toLowerCase();
-  if (!command) return;
+async function executeLabCommand(rawCommand, opts = { store: true, source: 'lab' }) {
+  const commandRaw = String(rawCommand || '').trim();
+  if (!commandRaw || terminalBusy) return;
 
+  const command = commandRaw.toLowerCase();
   const normalized = labAliases[command] || command;
 
   if (opts.store !== false && normalized !== 'clear') {
-    labHistory.unshift(command);
+    labHistory.unshift(commandRaw);
     labHistory = Array.from(new Set(labHistory)).slice(0, 20);
     labHistoryCursor = -1;
   }
@@ -135,27 +236,74 @@ function executeLabCommand(rawCommand, opts = { store: true }) {
 
   if (normalized === 'clear') {
     typeToLab('');
+    setTopTerminalStatus('Cleared. Top terminal is connected to the Interactive Lab below.');
     return;
   }
 
-  const response = labResponses[normalized] || `Unknown command: ${command}\nRun 'help' for available commands.`;
-  typeToLab(`> ${command}\n\n${response}`);
+  const aiPreset = {
+    'ai.summary': 'Give a concise professional summary of Chaman S in 5 bullet points.',
+    'ai.projects': 'Summarize Chaman’s strongest projects and technical impact.',
+    'ai.skills': 'Group Chaman’s top skills by frontend, backend, AI, and DevOps with short impact notes.'
+  };
+
+  let aiQuery = null;
+  if (command.startsWith('ask ')) {
+    aiQuery = commandRaw.slice(4).trim();
+  } else if (aiPreset[normalized]) {
+    aiQuery = aiPreset[normalized];
+  } else if (!labResponses[normalized]) {
+    aiQuery = commandRaw;
+  }
+
+  if (aiQuery) {
+    try {
+      terminalBusy = true;
+      typeToLab(`> ${commandRaw}\n\nthinking..`);
+      if (opts.source === 'top') {
+        setTopTerminalStatus(`Sent to lab: ${commandRaw}`);
+      }
+      const response = await callGroqWithRag(aiQuery);
+      typeToLab(`> ${commandRaw}\n\n${response}`);
+    } catch (err) {
+      typeToLab(`> ${commandRaw}\n\n${err.message}`);
+    } finally {
+      terminalBusy = false;
+    }
+    return;
+  }
+
+  const response = labResponses[normalized] || `Unknown command: ${commandRaw}\nTry: ask summarize my internships`;
+  typeToLab(`> ${commandRaw}\n\n${response}`);
+  if (opts.source === 'top') {
+    setTopTerminalStatus(`Sent to lab: ${commandRaw}`);
+  }
 }
 
 if (labButtons.length) {
   labButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const cmd = btn.getAttribute('data-lab-cmd');
-      executeLabCommand(cmd);
-    });
+    btn.addEventListener('click', () => executeLabCommand(btn.getAttribute('data-lab-cmd')));
   });
+}
+
+function handleSharedSubmit(inputEl, source) {
+  const cmd = inputEl?.value || '';
+  if (!cmd.trim()) return;
+  executeLabCommand(cmd, { source });
+  if (source === 'top') {
+    if (labInputEl) labInputEl.value = cmd;
+    document.getElementById('lab')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  if (inputEl) inputEl.value = '';
 }
 
 labFormEl?.addEventListener('submit', (e) => {
   e.preventDefault();
-  const cmd = labInputEl?.value || '';
-  executeLabCommand(cmd);
-  if (labInputEl) labInputEl.value = '';
+  handleSharedSubmit(labInputEl, 'lab');
+});
+
+fetchFormEl?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  handleSharedSubmit(fetchInputEl, 'top');
 });
 
 labInputEl?.addEventListener('keydown', (e) => {
@@ -171,7 +319,7 @@ labInputEl?.addEventListener('keydown', (e) => {
   }
 });
 
-executeLabCommand('help', { store: false });
+executeLabCommand('help', { store: false, source: 'lab' });
 
 // Scroll progress
 function updateScrollProgress() {
@@ -387,10 +535,17 @@ async function loadGitHubData() {
       ghHeadlineEl.textContent = `${user.public_repos ?? 0} public repos • ${user.followers ?? 0} followers • ${user.location || 'Open to global collaboration'}`;
     }
 
+    githubProfileChunk = `GitHub profile ${user?.login || 'chaman2003'}: ${user?.public_repos ?? 0} public repos, ${user?.followers ?? 0} followers, location ${user?.location || 'not specified'}, bio: ${user?.bio || 'N/A'}.`;
+
     const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=30');
     const repos = await reposRes.json();
 
     if (!Array.isArray(repos) || !ghCardsEl) return;
+
+    githubRagChunks = repos
+      .filter((r) => r.description && r.description.trim())
+      .slice(0, 18)
+      .map((r) => `Repo ${r.name}: ${r.description}. Language: ${r.language || 'Mixed'}. Stars: ${r.stargazers_count}.`);
 
     const ghCols = getGithubCols();
     const targetCards = ghCols * 2;
