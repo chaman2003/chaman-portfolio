@@ -10,6 +10,18 @@ const clickFxEl = document.getElementById('clickFx');
 const backToTopBtn = document.getElementById('backToTop');
 const labOutputEl = document.getElementById('labOutput');
 const labButtons = Array.from(document.querySelectorAll('.lab-btn'));
+const labFormEl = document.getElementById('labForm');
+const labInputEl = document.getElementById('labInput');
+const labHistoryEl = document.getElementById('labHistory');
+const labCubeEl = document.getElementById('labCube');
+const meterCreativityEl = document.getElementById('meterCreativity');
+const meterExecutionEl = document.getElementById('meterExecution');
+const meterOptimizationEl = document.getElementById('meterOptimization');
+const meterShippingEl = document.getElementById('meterShipping');
+const meterCreativityValEl = document.getElementById('meterCreativityVal');
+const meterExecutionValEl = document.getElementById('meterExecutionVal');
+const meterOptimizationValEl = document.getElementById('meterOptimizationVal');
+const meterShippingValEl = document.getElementById('meterShippingVal');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -64,23 +76,165 @@ if ('IntersectionObserver' in window) {
 
 // Lab console commands
 const labResponses = {
+  help: `Available commands:\n- help\n- about\n- stack\n- focus\n- contact\n- github\n- linkedin\n- resume\n- achievements\n- languages\n- clear\n- easter`,
   about: `Chaman S\nSoftware Engineer (Full-Stack | MERN | AI Systems)\nAI & ML Undergraduate (B.E, CGPA 8.7)\nBengaluru, Karnataka`,
   stack: `Core Stack:\n- React, TypeScript, Node.js, Express\n- Python, Flask, Socket.IO\n- MongoDB, PostgreSQL, Supabase\n- LLMs, RAG, LangChain, MCP\n- Docker, Kubernetes, CI/CD`,
-  focus: `Current Focus:\n- AI-first full-stack systems\n- Voice + OCR workflows\n- Reliable low-latency product engineering\n- Production-ready architecture`,
+  focus: `Current Focus:\n- AI-first full-stack systems\n- Voice + OCR workflows\n- Secure, scalable architecture\n- Production-ready deployment`,
   contact: `Contact:\nEmail: chaman2003.dev@gmail.com\nPhone: +91 6361005641\nLinkedIn: linkedin.com/in/chaman2003\nGitHub: github.com/chaman2003`,
-  github: `GitHub Snapshot:\n- Open source repositories in AI + MERN\n- Featured: Epsilora AI, PrintChakra AI, PeakHive\n- Username: @chaman2003`,
-  easter: `⚡ Vrik console unlocked:\nBuild. Break. Learn. Repeat. 🚀`
+  github: `GitHub Snapshot:\n- Username: @chaman2003\n- Full-stack + AI oriented repositories\n- Fast iteration + polished product mindset`,
+  linkedin: `LinkedIn:\n- linkedin.com/in/chaman2003\n- Open to internships, collaborations, product roles`,
+  resume: `Resume Highlights:\n- B.E AI & ML (CGPA 8.7)\n- Cortex Craft AI (Jan 2026 - Present)\n- Edunet Foundation (Mar 2025 - Apr 2025)\n- PrintChakra sponsorship ₹4,500`,
+  achievements: `Achievements:\n- 1st rank in 3rd and 6th semester (AI & ML, VKIT)\n- SCIMAGINATION 2K23: 2nd place\n- SCIMAGINATION 2K25: 2nd place`,
+  languages: `Languages:\nEnglish (Fluent)\nHindi (Fluent)\nKannada (Native)\nTelugu (Conversational)`,
+  easter: `⚡ Vrik console unlocked:\nBuild. Break. Learn. Repeat. Ship. 🚀`
 };
 
-if (labOutputEl && labButtons.length) {
+const labAliases = {
+  'about.me': 'about',
+  'stack.list': 'stack',
+  'focus.now': 'focus',
+  'contact.info': 'contact',
+  'github.peek': 'github',
+  'linkedin.peek': 'linkedin',
+  'resume.scan': 'resume',
+  'achievements.top': 'achievements'
+};
+
+let labHistory = [];
+let labHistoryCursor = -1;
+
+function typeToLab(text) {
+  if (!labOutputEl) return;
+  if (prefersReducedMotion) {
+    labOutputEl.textContent = text;
+    return;
+  }
+
+  labOutputEl.textContent = '';
+  let idx = 0;
+  const tick = () => {
+    idx += Math.max(1, Math.floor(text.length / 120));
+    labOutputEl.textContent = text.slice(0, idx);
+    labOutputEl.scrollTop = labOutputEl.scrollHeight;
+    if (idx < text.length) {
+      requestAnimationFrame(tick);
+    }
+  };
+  tick();
+}
+
+function renderLabHistory() {
+  if (!labHistoryEl) return;
+  if (!labHistory.length) {
+    labHistoryEl.innerHTML = '<li>No commands yet.</li>';
+    return;
+  }
+
+  labHistoryEl.innerHTML = labHistory
+    .slice(0, 6)
+    .map((cmd) => `<li data-history-cmd="${cmd}">${cmd}</li>`)
+    .join('');
+
+  labHistoryEl.querySelectorAll('[data-history-cmd]').forEach((item) => {
+    item.addEventListener('click', () => executeLabCommand(item.getAttribute('data-history-cmd')));
+  });
+}
+
+function setActiveLabButton(cmd) {
+  labButtons.forEach((b) => {
+    b.classList.toggle('active', b.getAttribute('data-lab-cmd') === cmd);
+  });
+}
+
+function executeLabCommand(rawCommand, opts = { store: true }) {
+  const command = String(rawCommand || '').trim().toLowerCase();
+  if (!command) return;
+
+  const normalized = labAliases[command] || command;
+
+  if (opts.store !== false && normalized !== 'clear') {
+    labHistory.unshift(command);
+    labHistory = Array.from(new Set(labHistory)).slice(0, 20);
+    labHistoryCursor = -1;
+    renderLabHistory();
+  }
+
+  setActiveLabButton(normalized);
+
+  if (normalized === 'clear') {
+    typeToLab('');
+    return;
+  }
+
+  const response = labResponses[normalized] || `Unknown command: ${command}\nRun 'help' for available commands.`;
+  typeToLab(`> ${command}\n\n${response}`);
+}
+
+if (labButtons.length) {
   labButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const cmd = btn.getAttribute('data-lab-cmd');
-      const output = labResponses[cmd] || 'Unknown command';
-      labButtons.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      labOutputEl.textContent = `> ${cmd}\n\n${output}`;
+      executeLabCommand(cmd);
     });
+  });
+}
+
+labFormEl?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const cmd = labInputEl?.value || '';
+  executeLabCommand(cmd);
+  if (labInputEl) labInputEl.value = '';
+});
+
+labInputEl?.addEventListener('keydown', (e) => {
+  if (!labHistory.length) return;
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    labHistoryCursor = Math.min(labHistoryCursor + 1, labHistory.length - 1);
+    labInputEl.value = labHistory[labHistoryCursor] || '';
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    labHistoryCursor = Math.max(labHistoryCursor - 1, -1);
+    labInputEl.value = labHistoryCursor >= 0 ? labHistory[labHistoryCursor] : '';
+  }
+});
+
+executeLabCommand('help', { store: false });
+
+// Lab telemetry meters
+const meterDefs = [
+  { fill: meterCreativityEl, val: meterCreativityValEl, min: 76, max: 96 },
+  { fill: meterExecutionEl, val: meterExecutionValEl, min: 78, max: 98 },
+  { fill: meterOptimizationEl, val: meterOptimizationValEl, min: 70, max: 92 },
+  { fill: meterShippingEl, val: meterShippingValEl, min: 74, max: 95 }
+];
+
+function updateMeters() {
+  meterDefs.forEach((m) => {
+    if (!m.fill || !m.val) return;
+    const score = Math.floor(Math.random() * (m.max - m.min + 1)) + m.min;
+    m.fill.style.width = `${score}%`;
+    m.val.textContent = `${score}%`;
+  });
+}
+
+updateMeters();
+if (!prefersReducedMotion) {
+  setInterval(updateMeters, 1700);
+}
+
+if (labCubeEl && !prefersReducedMotion) {
+  const stage = labCubeEl.closest('.cube-stage');
+  stage?.addEventListener('mousemove', (e) => {
+    const r = stage.getBoundingClientRect();
+    const rx = ((e.clientY - r.top) / r.height - 0.5) * -28;
+    const ry = ((e.clientX - r.left) / r.width - 0.5) * 28;
+    labCubeEl.style.animation = 'none';
+    labCubeEl.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+  });
+  stage?.addEventListener('mouseleave', () => {
+    labCubeEl.style.transform = '';
+    labCubeEl.style.animation = '';
   });
 }
 
@@ -389,6 +543,15 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
     ease: 'power3.out'
   });
 
+  gsap.from('.quick-meta span, .floating-tags span, .fetch-terminal', {
+    y: 14,
+    opacity: 0,
+    duration: 0.7,
+    stagger: 0.06,
+    delay: 0.2,
+    ease: 'power2.out'
+  });
+
   gsap.to('.logo-pill', {
     y: -4,
     duration: 1.6,
@@ -398,7 +561,7 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
     stagger: 0.12
   });
 
-  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card').forEach((el) => {
+  gsap.utils.toArray('.project, .profile-card, .timeline-item, .stat, .panel, .skill-logo-card, .achievement-card, .exp-card, .lab-controls, .lab-console-wrap, .lab-telemetry').forEach((el) => {
     gsap.from(el, {
       y: 26,
       opacity: 0,

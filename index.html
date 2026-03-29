@@ -388,24 +388,81 @@ Status     : Building production-ready AI products 🚀</code></pre>
 
       <section id="lab" class="panel glass reveal lab-section">
         <h2>Interactive Lab Console</h2>
-        <p class="muted">Quick command-style profile explorer.</p>
+        <p class="muted">Command center mode: query profile data, inspect stack, and simulate workflow telemetry.</p>
 
         <div class="lab-grid">
-          <div class="lab-controls">
-            <button class="lab-btn" data-lab-cmd="about">about.me</button>
-            <button class="lab-btn" data-lab-cmd="stack">stack.list</button>
-            <button class="lab-btn" data-lab-cmd="focus">focus.now</button>
-            <button class="lab-btn" data-lab-cmd="contact">contact.info</button>
-            <button class="lab-btn" data-lab-cmd="github">github.peek</button>
-            <button class="lab-btn" data-lab-cmd="easter">easter.egg</button>
+          <div class="lab-controls glass-sub">
+            <h4>Quick Commands</h4>
+            <div class="lab-btn-grid">
+              <button class="lab-btn" data-lab-cmd="help">help</button>
+              <button class="lab-btn" data-lab-cmd="about">about.me</button>
+              <button class="lab-btn" data-lab-cmd="stack">stack.list</button>
+              <button class="lab-btn" data-lab-cmd="focus">focus.now</button>
+              <button class="lab-btn" data-lab-cmd="contact">contact.info</button>
+              <button class="lab-btn" data-lab-cmd="github">github.peek</button>
+              <button class="lab-btn" data-lab-cmd="linkedin">linkedin.peek</button>
+              <button class="lab-btn" data-lab-cmd="resume">resume.scan</button>
+              <button class="lab-btn" data-lab-cmd="achievements">achievements.top</button>
+              <button class="lab-btn" data-lab-cmd="easter">easter.egg</button>
+            </div>
+
+            <div class="lab-history-wrap">
+              <p class="lab-meta-title">Recent Commands</p>
+              <ul id="labHistory" class="lab-history">
+                <li>No commands yet.</li>
+              </ul>
+            </div>
           </div>
 
-          <div class="lab-console" id="labConsole" role="status" aria-live="polite">
-            <div class="lab-console-head">
-              <span>vrik@chaman:~$</span>
-              <span class="lab-dot"></span>
+          <div class="lab-console-wrap">
+            <div class="lab-console" id="labConsole" role="status" aria-live="polite">
+              <div class="lab-console-head">
+                <span>vrik@chaman:~$ interactive-shell</span>
+                <span class="lab-dot"></span>
+              </div>
+              <pre id="labOutput">Type "help" or press any command chip to begin.</pre>
+              <form id="labForm" class="lab-input-row" autocomplete="off">
+                <span class="lab-prompt">❯</span>
+                <input id="labInput" name="labInput" type="text" placeholder="Type command (e.g. about, stack, resume, clear)" />
+                <button type="submit" class="lab-run">Run</button>
+              </form>
             </div>
-            <pre id="labOutput">Run a command to explore profile quickly.</pre>
+          </div>
+
+          <div class="lab-telemetry glass-sub">
+            <h4>Realtime Telemetry</h4>
+
+            <div class="meter-row">
+              <label>Creativity</label>
+              <div class="meter-track"><div class="meter-fill" id="meterCreativity"></div></div>
+              <span id="meterCreativityVal">84%</span>
+            </div>
+            <div class="meter-row">
+              <label>Execution</label>
+              <div class="meter-track"><div class="meter-fill" id="meterExecution"></div></div>
+              <span id="meterExecutionVal">91%</span>
+            </div>
+            <div class="meter-row">
+              <label>Optimization</label>
+              <div class="meter-track"><div class="meter-fill" id="meterOptimization"></div></div>
+              <span id="meterOptimizationVal">79%</span>
+            </div>
+            <div class="meter-row">
+              <label>Shipping Speed</label>
+              <div class="meter-track"><div class="meter-fill" id="meterShipping"></div></div>
+              <span id="meterShippingVal">88%</span>
+            </div>
+
+            <div class="cube-stage" aria-hidden="true">
+              <div class="cube" id="labCube">
+                <div class="face f1">AI</div>
+                <div class="face f2">MERN</div>
+                <div class="face f3">RAG</div>
+                <div class="face f4">DEV</div>
+                <div class="face f5">OPS</div>
+                <div class="face f6">SHIP</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
