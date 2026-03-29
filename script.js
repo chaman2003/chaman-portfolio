@@ -1,16 +1,202 @@
-const reveals = document.querySelectorAll('.reveal');
+const yearEl = document.getElementById('year');
+const typewriterEl = document.getElementById('typewriter');
+const ghCardsEl = document.getElementById('githubCards');
+const ghHeadlineEl = document.getElementById('ghHeadline');
 
-const observer = new IntersectionObserver(
+if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
+      if (entry.isIntersecting) entry.target.classList.add('visible');
     });
   },
   { threshold: 0.12 }
 );
+reveals.forEach((el) => revealObserver.observe(el));
 
-reveals.forEach((el) => observer.observe(el));
+// Counter animation
+const counters = document.querySelectorAll('[data-counter]');
+const counterObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = Number(el.getAttribute('data-counter'));
+      let value = 0;
+      const increment = Math.max(1, Math.ceil(target / 40));
+      const timer = setInterval(() => {
+        value += increment;
+        if (value >= target) {
+          value = target;
+          clearInterval(timer);
+        }
+        el.textContent = value + (target === 24 ? '/7' : '+');
+      }, 28);
+      counterObserver.unobserve(el);
+    });
+  },
+  { threshold: 0.4 }
+);
+counters.forEach((counter) => counterObserver.observe(counter));
 
-document.getElementById('year').textContent = new Date().getFullYear();
+// Typewriter effect
+const lines = [
+  'crafting scalable MERN + AI systems...',
+  'shipping user-first digital experiences...',
+  'turning ideas into production-ready products...'
+];
+let lineIndex = 0;
+let charIndex = 0;
+let deleting = false;
+
+function runTypewriter() {
+  if (!typewriterEl) return;
+  const current = lines[lineIndex];
+
+  if (!deleting) {
+    charIndex++;
+    typewriterEl.textContent = current.slice(0, charIndex);
+    if (charIndex === current.length) {
+      deleting = true;
+      return setTimeout(runTypewriter, 1200);
+    }
+  } else {
+    charIndex--;
+    typewriterEl.textContent = current.slice(0, charIndex);
+    if (charIndex === 0) {
+      deleting = false;
+      lineIndex = (lineIndex + 1) % lines.length;
+    }
+  }
+
+  setTimeout(runTypewriter, deleting ? 32 : 58);
+}
+runTypewriter();
+
+// Cursor glow follow
+const cursorGlow = document.getElementById('cursorGlow');
+window.addEventListener('mousemove', (e) => {
+  if (!cursorGlow) return;
+  cursorGlow.style.left = `${e.clientX - 160}px`;
+  cursorGlow.style.top = `${e.clientY - 160}px`;
+});
+
+// 3D tilt cards
+const tiltCards = document.querySelectorAll('.tilt');
+tiltCards.forEach((card) => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rotateY = ((x / rect.width) - 0.5) * 8;
+    const rotateX = (0.5 - (y / rect.height)) * 8;
+    card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg)';
+  });
+});
+
+// GitHub API data
+async function loadGitHubData() {
+  try {
+    const userRes = await fetch('https://api.github.com/users/chaman2003');
+    const user = await userRes.json();
+
+    if (ghHeadlineEl && user?.login) {
+      ghHeadlineEl.textContent = `${user.public_repos ?? 0} public repos • ${user.followers ?? 0} followers • ${user.location || 'Open to global collaboration'}`;
+    }
+
+    const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=6');
+    const repos = await reposRes.json();
+
+    if (!Array.isArray(repos) || !ghCardsEl) return;
+
+    ghCardsEl.innerHTML = repos
+      .slice(0, 6)
+      .map((repo) => {
+        const desc = repo.description || 'No description provided yet.';
+        const lang = repo.language || 'Mixed';
+        return `
+          <article class="repo-card">
+            <div class="repo-top">
+              <h4>${repo.name}</h4>
+              <a class="inline-link" href="${repo.html_url}" target="_blank" rel="noreferrer">Open</a>
+            </div>
+            <p>${desc}</p>
+            <div class="repo-meta">
+              <span>★ ${repo.stargazers_count}</span>
+              <span>⑂ ${repo.forks_count}</span>
+              <span>${lang}</span>
+            </div>
+          </article>
+        `;
+      })
+      .join('');
+  } catch (error) {
+    if (ghCardsEl) {
+      ghCardsEl.innerHTML = '<p class="muted">Could not load GitHub data right now. Please refresh in a moment.</p>';
+    }
+    if (ghHeadlineEl) {
+      ghHeadlineEl.textContent = 'GitHub sync temporarily unavailable.';
+    }
+  }
+}
+loadGitHubData();
+
+// Starfield background
+const canvas = document.getElementById('starfield');
+const ctx = canvas?.getContext('2d');
+
+if (canvas && ctx) {
+  const stars = [];
+  const starCount = 120;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function seedStars() {
+    stars.length = 0;
+    for (let i = 0; i < starCount; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.2,
+        speed: Math.random() * 0.25 + 0.08
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+
+    for (const s of stars) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      s.y += s.speed;
+      if (s.y > canvas.height) {
+        s.y = -5;
+        s.x = Math.random() * canvas.width;
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  seedStars();
+  draw();
+
+  window.addEventListener('resize', () => {
+    resize();
+    seedStars();
+  });
+}
