@@ -9,7 +9,12 @@
   --glass: rgba(255, 255, 255, 0.06);
   --border: rgba(255, 255, 255, 0.15);
   --shadow: 0 24px 75px rgba(0, 229, 255, 0.18);
+  --brand-text: #ffffff;
+  --typewriter-text: #d8eeff;
+  --ticker-text: #cfe8ff;
+  --ticker-bg: rgba(255, 255, 255, 0.03);
 }
+
 
 body[data-theme="light"] {
   --bg-1: #edf4ff;
@@ -22,6 +27,10 @@ body[data-theme="light"] {
   --glass: rgba(255, 255, 255, 0.6);
   --border: rgba(13, 27, 58, 0.15);
   --shadow: 0 18px 45px rgba(0, 60, 255, 0.12);
+  --brand-text: #0d1b3a;
+  --typewriter-text: #16305f;
+  --ticker-text: #243b68;
+  --ticker-bg: rgba(13, 27, 58, 0.06);
 }
 
 * { box-sizing: border-box; }
@@ -133,7 +142,7 @@ body {
 }
 
 .brand {
-  color: #fff;
+  color: var(--brand-text);
   text-decoration: none;
   font-family: Orbitron, sans-serif;
   font-weight: 800;
@@ -206,7 +215,7 @@ h1 span {
 }
 
 .terminal-tag { color: var(--accent); font-weight: 700; }
-#typewriter { color: #d8eeff; min-width: 150px; }
+#typewriter { color: var(--typewriter-text); min-width: 150px; }
 
 .caret {
   width: 7px;
@@ -269,7 +278,7 @@ h1 span {
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--ticker-bg);
 }
 
 .ticker {
@@ -277,11 +286,19 @@ h1 span {
   gap: 1.2rem;
   white-space: nowrap;
   padding: 0.5rem 0.85rem;
-  min-width: 200%;
-  animation: ticker 22s linear infinite;
-  color: #cfe8ff;
+  width: max-content;
+  animation: ticker-loop 32s linear infinite;
+  color: var(--ticker-text);
 }
-@keyframes ticker { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+.ticker span {
+  flex: 0 0 auto;
+}
+
+@keyframes ticker-loop {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
 
 .stats {
   margin-top: 0.8rem;
@@ -394,7 +411,7 @@ h2 { margin: 0 0 0.75rem; }
   border-radius: 50%;
   display: inline-grid;
   place-items: center;
-  color: #021018;
+  color: #051226;
   font-weight: 800;
   background: linear-gradient(135deg, var(--primary), #7cf8ff);
 }
