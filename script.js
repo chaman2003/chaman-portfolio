@@ -356,14 +356,11 @@ loadGitHubData();
 let githubReloadTimer;
 window.addEventListener('resize', () => {
   clearTimeout(githubReloadTimer);
-  githubReloadTimer = setTimeout(loadGitHubData, 180);
-
-  if (tickerTrack?.dataset.loopReady === '1') {
-    tickerTrack.style.setProperty('--loop-shift', `${tickerTrack.scrollWidth / 2}px`);
-  }
-  if (logoMarqueeEl?.dataset.loopReady === '1') {
-    logoMarqueeEl.style.setProperty('--loop-shift', `${logoMarqueeEl.scrollWidth / 2}px`);
-  }
+  githubReloadTimer = setTimeout(() => {
+    loadGitHubData();
+    setupInfiniteMarquee(tickerTrack);
+    setupInfiniteMarquee(logoMarqueeEl);
+  }, 180);
 });
 
 // GSAP premium animations
@@ -417,14 +414,34 @@ if (window.gsap && window.ScrollTrigger && !prefersReducedMotion) {
 }
 
 function setupInfiniteMarquee(trackEl) {
-  if (!trackEl || trackEl.dataset.loopReady === '1') return;
-  const base = trackEl.innerHTML;
-  trackEl.innerHTML = `${base}${base}`;
-  trackEl.dataset.loopReady = '1';
+  if (!trackEl) return;
+
+  const sourceHtml = trackEl.dataset.sourceHtml || trackEl.innerHTML;
+  trackEl.dataset.sourceHtml = sourceHtml;
+
+  const template = document.createElement('template');
+  template.innerHTML = sourceHtml.trim();
+  const baseItems = Array.from(template.content.children);
+  if (!baseItems.length) return;
+
+  trackEl.innerHTML = '';
+
+  const containerWidth = trackEl.parentElement?.clientWidth || window.innerWidth;
+  let passes = 0;
+  while (passes < 8 && trackEl.scrollWidth < containerWidth * 1.8) {
+    baseItems.forEach((item) => trackEl.appendChild(item.cloneNode(true)));
+    passes += 1;
+  }
+
+  const oneSet = trackEl.innerHTML;
+  trackEl.innerHTML = `${oneSet}${oneSet}`;
 
   requestAnimationFrame(() => {
     const shift = trackEl.scrollWidth / 2;
+    const durationSec = Math.max(18, shift / 70);
     trackEl.style.setProperty('--loop-shift', `${shift}px`);
+    trackEl.style.setProperty('--loop-duration', `${durationSec}s`);
+    trackEl.dataset.loopReady = '1';
   });
 }
 
