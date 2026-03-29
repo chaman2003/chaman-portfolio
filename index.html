@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chaman S | Futuristic Portfolio</title>
+    <title>Chaman S | Futuristic Portfolio v3</title>
     <meta
       name="description"
-      content="Futuristic portfolio of Chaman S — AI-first full-stack developer building scalable and intelligent digital products."
+      content="Futuristic portfolio v3 of Chaman S — AI-first full-stack developer with immersive UI and dynamic GitHub integrations."
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,7 +19,11 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div id="scrollProgress" aria-hidden="true"></div>
     <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="aurora aurora-a" aria-hidden="true"></div>
+    <div class="aurora aurora-b" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
     <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 
     <header class="header glass">
@@ -29,26 +33,29 @@
         <a href="#about">About</a>
         <a href="#projects">Projects</a>
         <a href="#profiles">Profiles</a>
-        <a href="#skills">Skills</a>
+        <a href="#timeline">Timeline</a>
         <a href="#contact">Contact</a>
       </nav>
 
-      <a class="btn btn-ghost" href="https://portfolio-chaman.vercel.app/" target="_blank" rel="noreferrer">Live v1</a>
+      <div class="header-actions">
+        <button id="commandDeckOpen" class="btn btn-ghost" type="button">Command Deck</button>
+        <a class="btn btn-ghost" href="https://portfolio-chaman.vercel.app/" target="_blank" rel="noreferrer">Live v1</a>
+      </div>
     </header>
 
     <main id="home">
-      <section class="hero">
-        <p class="chip">⚡ FUTURE-READY PORTFOLIO</p>
+      <section class="hero" id="heroScene">
+        <p class="chip">⚡ FUTURISTIC PORTFOLIO v3</p>
 
         <h1>
-          I build <span>AI-powered</span> web products that feel clean,
-          fast, and intelligent.
+          I build <span>AI-native</span> products that feel premium,
+          perform fast, and scale clean.
         </h1>
 
         <p class="subtitle">
-          Hey, I’m <strong>Chaman S</strong> — AI & ML undergraduate + full-stack
-          builder. I love turning ambitious ideas into polished, scalable user
-          experiences.
+          I’m <strong>Chaman S</strong> — AI & ML undergraduate + full-stack builder.
+          I design and ship smart systems where product thinking, engineering, and
+          creativity meet.
         </p>
 
         <div class="type-line">
@@ -58,38 +65,33 @@
         </div>
 
         <div class="cta-row">
-          <a class="btn btn-primary" href="https://github.com/chaman2003" target="_blank" rel="noreferrer">GitHub</a>
-          <a class="btn btn-secondary" href="https://linkedin.com/in/chaman2003" target="_blank" rel="noreferrer">LinkedIn</a>
-          <a class="btn btn-ghost" href="https://leetcode.com/chaman2003/" target="_blank" rel="noreferrer">LeetCode</a>
+          <a class="btn btn-primary magnetic" href="https://github.com/chaman2003" target="_blank" rel="noreferrer">GitHub</a>
+          <a class="btn btn-secondary magnetic" href="https://linkedin.com/in/chaman2003" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a class="btn btn-ghost magnetic" href="https://leetcode.com/chaman_2003/" target="_blank" rel="noreferrer">LeetCode</a>
+        </div>
+      </section>
+
+      <section class="ticker-wrap reveal" aria-label="tech ticker">
+        <div class="ticker" id="tickerTrack">
+          <span>⚙ MERN Stack</span><span>🤖 AI APIs</span><span>🧠 LLM Workflows</span><span>🚀 Scalable Systems</span><span>🎨 Product UI</span><span>📦 DevOps</span>
+          <span>⚙ MERN Stack</span><span>🤖 AI APIs</span><span>🧠 LLM Workflows</span><span>🚀 Scalable Systems</span><span>🎨 Product UI</span><span>📦 DevOps</span>
         </div>
       </section>
 
       <section class="stats reveal">
-        <article class="stat glass">
-          <h3 data-counter="15">0</h3>
-          <p>Projects Built</p>
-        </article>
-        <article class="stat glass">
-          <h3 data-counter="20">0</h3>
-          <p>Tech Tools Mastered</p>
-        </article>
-        <article class="stat glass">
-          <h3 data-counter="100">0</h3>
-          <p>Ideas Prototyped</p>
-        </article>
-        <article class="stat glass">
-          <h3 data-counter="24">0</h3>
-          <p>Builder Mode</p>
-        </article>
+        <article class="stat glass"><h3 data-counter="20">0</h3><p>Projects Built</p></article>
+        <article class="stat glass"><h3 data-counter="30">0</h3><p>Tech/Tools Used</p></article>
+        <article class="stat glass"><h3 data-counter="100">0</h3><p>Ideas Prototyped</p></article>
+        <article class="stat glass"><h3 data-counter="24">0</h3><p>Builder Mode</p></article>
       </section>
 
       <section id="about" class="panel glass reveal">
         <h2>About Me</h2>
         <p>
-          I specialize in the overlap between <strong>Full-Stack Engineering</strong>,
-          <strong>AI Integration</strong>, and <strong>Product Thinking</strong>.
-          I care about performance, elegant architecture, and building software that
-          solves real-world problems.
+          I work at the intersection of <strong>Full-Stack Engineering</strong>,
+          <strong>AI Integration</strong>, and <strong>Product Design</strong>. I care about
+          architecture quality, interactive UX, and delivering software that solves
+          practical problems with measurable impact.
         </p>
       </section>
 
@@ -102,25 +104,25 @@
         <div class="project-grid">
           <article class="project glass tilt">
             <h3>Epsilora AI</h3>
-            <p>AI LMS with smart quiz generation, chatbot support, and learning analytics.</p>
+            <p>AI LMS with chatbot support, auto-quiz generation, and analytics-focused learning UX.</p>
             <div class="tags"><span>React</span><span>TypeScript</span><span>Gemini API</span></div>
           </article>
 
           <article class="project glass tilt">
             <h3>PrintChakra AI</h3>
-            <p>OCR + voice-enabled document automation with real-time multi-device workflows.</p>
+            <p>OCR + voice-driven print and scan automation with real-time workflow synchronization.</p>
             <div class="tags"><span>Flask</span><span>OCR</span><span>Socket.IO</span></div>
           </article>
 
           <article class="project glass tilt">
             <h3>PeakHive</h3>
-            <p>MERN e-commerce engine with JWT auth, analytics dashboards, and smooth UX.</p>
+            <p>MERN e-commerce system with JWT auth, filters, dashboards, and conversion-minded UI.</p>
             <div class="tags"><span>MERN</span><span>JWT</span><span>Chart.js</span></div>
           </article>
 
           <article class="project glass tilt">
             <h3>Tic Tac Toe AI</h3>
-            <p>Minimax-based AI gameplay with responsive cyber-themed interface and modes.</p>
+            <p>Minimax-driven game engine with cyber themes and responsive gameplay across devices.</p>
             <div class="tags"><span>Flask</span><span>JavaScript</span><span>Minimax</span></div>
           </article>
         </div>
@@ -147,19 +149,29 @@
 
           <article class="profile-card glass">
             <h3>LeetCode</h3>
-            <p class="muted">Handle: <strong>@chaman2003</strong> • Consistent problem-solving practice in DSA + logic building.</p>
+            <p class="muted">Handle: <strong>@chaman_2003</strong> • DSA consistency + problem-solving muscle.</p>
             <div class="badges">
-              <img alt="LeetCode badge" src="https://img.shields.io/badge/LeetCode-chaman2003-FFA116?logo=leetcode&logoColor=black" />
-              <img alt="Coding mindset" src="https://img.shields.io/badge/Mindset-Consistency-00E5FF" />
+              <img alt="LeetCode badge" src="https://img.shields.io/badge/LeetCode-chaman__2003-FFA116?logo=leetcode&logoColor=black" />
+              <img alt="Consistency badge" src="https://img.shields.io/badge/Focus-Consistency-00E5FF" />
             </div>
-            <a class="inline-link" href="https://leetcode.com/chaman2003/" target="_blank" rel="noreferrer">Open LeetCode →</a>
+            <a class="inline-link" href="https://leetcode.com/chaman_2003/" target="_blank" rel="noreferrer">Open LeetCode →</a>
           </article>
 
           <article class="profile-card glass">
             <h3>LinkedIn</h3>
-            <p class="muted">Professional updates, collaborations, and career milestones.</p>
+            <p class="muted">Professional updates, collaborations, and growth journey.</p>
             <a class="inline-link" href="https://linkedin.com/in/chaman2003" target="_blank" rel="noreferrer">Open LinkedIn →</a>
           </article>
+        </div>
+      </section>
+
+      <section id="timeline" class="reveal">
+        <h2>Builder Timeline</h2>
+        <div class="timeline">
+          <article class="timeline-item glass"><span>01</span><div><h4>Foundation</h4><p>Started with core web fundamentals and JavaScript architecture thinking.</p></div></article>
+          <article class="timeline-item glass"><span>02</span><div><h4>Full-Stack Depth</h4><p>Built MERN systems with auth, dashboards, APIs, and deployment workflows.</p></div></article>
+          <article class="timeline-item glass"><span>03</span><div><h4>AI Integration</h4><p>Shipped AI-powered tools with chatbot, OCR, and automation capabilities.</p></div></article>
+          <article class="timeline-item glass"><span>04</span><div><h4>Product Polish</h4><p>Focused on performance, usability, storytelling UI, and premium design systems.</p></div></article>
         </div>
       </section>
 
@@ -177,13 +189,35 @@
 
       <section id="contact" class="panel glass reveal contact-panel">
         <h2>Let’s build something legendary.</h2>
-        <p class="muted">Open for internships, collaborations, and AI-native product builds.</p>
+        <p class="muted">Open for internships, collaborations, and ambitious AI-native products.</p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="mailto:chamans7952@gmail.com">Mail Me</a>
-          <a class="btn btn-secondary" href="https://github.com/chaman2003" target="_blank" rel="noreferrer">Collaborate on GitHub</a>
+          <a class="btn btn-primary magnetic" href="mailto:chamans7952@gmail.com">Mail Me</a>
+          <a class="btn btn-secondary magnetic" href="https://github.com/chaman2003" target="_blank" rel="noreferrer">Collaborate on GitHub</a>
         </div>
       </section>
     </main>
+
+    <aside class="quick-dock glass" aria-label="quick dock">
+      <a href="https://github.com/chaman2003" target="_blank" rel="noreferrer">GitHub</a>
+      <a href="https://leetcode.com/chaman_2003/" target="_blank" rel="noreferrer">LeetCode</a>
+      <a href="mailto:chamans7952@gmail.com">Email</a>
+    </aside>
+
+    <section id="commandDeck" class="command-deck" aria-hidden="true">
+      <div class="command-card glass">
+        <div class="command-top">
+          <h3>Command Deck</h3>
+          <button id="commandDeckClose" type="button">✕</button>
+        </div>
+        <p class="muted">Quick launch actions</p>
+        <div class="command-actions">
+          <button data-action="github" type="button">Open GitHub</button>
+          <button data-action="leetcode" type="button">Open LeetCode</button>
+          <button data-action="linkedin" type="button">Open LinkedIn</button>
+          <button data-action="mail" type="button">Write Email</button>
+        </div>
+      </div>
+    </section>
 
     <footer>
       <p>© <span id="year"></span> Chaman S • Designed in futuristic mode ✦</p>

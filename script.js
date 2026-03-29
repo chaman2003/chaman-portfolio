@@ -2,8 +2,21 @@ const yearEl = document.getElementById('year');
 const typewriterEl = document.getElementById('typewriter');
 const ghCardsEl = document.getElementById('githubCards');
 const ghHeadlineEl = document.getElementById('ghHeadline');
+const scrollProgressEl = document.getElementById('scrollProgress');
+const heroSceneEl = document.getElementById('heroScene');
 
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+// Scroll progress
+function updateScrollProgress() {
+  if (!scrollProgressEl) return;
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const ratio = height > 0 ? (scrollTop / height) * 100 : 0;
+  scrollProgressEl.style.width = `${ratio}%`;
+}
+window.addEventListener('scroll', updateScrollProgress);
+updateScrollProgress();
 
 // Reveal on scroll
 const reveals = document.querySelectorAll('.reveal');
@@ -45,7 +58,7 @@ counters.forEach((counter) => counterObserver.observe(counter));
 // Typewriter effect
 const lines = [
   'crafting scalable MERN + AI systems...',
-  'shipping user-first digital experiences...',
+  'shipping premium user-first experiences...',
   'turning ideas into production-ready products...'
 ];
 let lineIndex = 0;
@@ -72,7 +85,7 @@ function runTypewriter() {
     }
   }
 
-  setTimeout(runTypewriter, deleting ? 32 : 58);
+  setTimeout(runTypewriter, deleting ? 30 : 56);
 }
 runTypewriter();
 
@@ -84,6 +97,18 @@ window.addEventListener('mousemove', (e) => {
   cursorGlow.style.top = `${e.clientY - 160}px`;
 });
 
+// Hero parallax
+window.addEventListener('mousemove', (e) => {
+  if (!heroSceneEl || window.innerWidth < 900) return;
+  const x = (e.clientX / window.innerWidth - 0.5) * 8;
+  const y = (e.clientY / window.innerHeight - 0.5) * 8;
+  heroSceneEl.style.transform = `perspective(1000px) rotateY(${x * 0.4}deg) rotateX(${-y * 0.35}deg)`;
+});
+window.addEventListener('mouseleave', () => {
+  if (!heroSceneEl) return;
+  heroSceneEl.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+});
+
 // 3D tilt cards
 const tiltCards = document.querySelectorAll('.tilt');
 tiltCards.forEach((card) => {
@@ -92,11 +117,70 @@ tiltCards.forEach((card) => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     const rotateY = ((x / rect.width) - 0.5) * 8;
-    const rotateX = (0.5 - (y / rect.height)) * 8;
+    const rotateX = (0.5 - y / rect.height) * 8;
     card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
   });
   card.addEventListener('mouseleave', () => {
     card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg)';
+  });
+});
+
+// Magnetic buttons
+const magneticButtons = document.querySelectorAll('.magnetic');
+magneticButtons.forEach((btn) => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
+    btn.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = 'translate(0, 0)';
+  });
+});
+
+// Command deck modal
+const deckEl = document.getElementById('commandDeck');
+const deckOpenBtn = document.getElementById('commandDeckOpen');
+const deckCloseBtn = document.getElementById('commandDeckClose');
+
+function openDeck() {
+  if (!deckEl) return;
+  deckEl.classList.add('active');
+  deckEl.setAttribute('aria-hidden', 'false');
+}
+
+function closeDeck() {
+  if (!deckEl) return;
+  deckEl.classList.remove('active');
+  deckEl.setAttribute('aria-hidden', 'true');
+}
+
+deckOpenBtn?.addEventListener('click', openDeck);
+deckCloseBtn?.addEventListener('click', closeDeck);
+deckEl?.addEventListener('click', (e) => {
+  if (e.target === deckEl) closeDeck();
+});
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDeck();
+  if (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    openDeck();
+  }
+});
+
+const commandMap = {
+  github: 'https://github.com/chaman2003',
+  leetcode: 'https://leetcode.com/chaman_2003/',
+  linkedin: 'https://linkedin.com/in/chaman2003',
+  mail: 'mailto:chamans7952@gmail.com'
+};
+
+document.querySelectorAll('[data-action]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const action = btn.getAttribute('data-action');
+    const url = commandMap[action];
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
   });
 });
 
@@ -110,13 +194,13 @@ async function loadGitHubData() {
       ghHeadlineEl.textContent = `${user.public_repos ?? 0} public repos • ${user.followers ?? 0} followers • ${user.location || 'Open to global collaboration'}`;
     }
 
-    const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=6');
+    const reposRes = await fetch('https://api.github.com/users/chaman2003/repos?sort=updated&per_page=8');
     const repos = await reposRes.json();
 
     if (!Array.isArray(repos) || !ghCardsEl) return;
 
     ghCardsEl.innerHTML = repos
-      .slice(0, 6)
+      .slice(0, 8)
       .map((repo) => {
         const desc = repo.description || 'No description provided yet.';
         const lang = repo.language || 'Mixed';
@@ -138,7 +222,7 @@ async function loadGitHubData() {
       .join('');
   } catch (error) {
     if (ghCardsEl) {
-      ghCardsEl.innerHTML = '<p class="muted">Could not load GitHub data right now. Please refresh in a moment.</p>';
+      ghCardsEl.innerHTML = '<p class="muted">Could not load GitHub data right now. Refresh shortly.</p>';
     }
     if (ghHeadlineEl) {
       ghHeadlineEl.textContent = 'GitHub sync temporarily unavailable.';
@@ -153,7 +237,7 @@ const ctx = canvas?.getContext('2d');
 
 if (canvas && ctx) {
   const stars = [];
-  const starCount = 120;
+  const starCount = 160;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -166,18 +250,19 @@ if (canvas && ctx) {
       stars.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        r: Math.random() * 1.5 + 0.2,
-        speed: Math.random() * 0.25 + 0.08
+        r: Math.random() * 1.6 + 0.2,
+        speed: Math.random() * 0.3 + 0.09,
+        alpha: Math.random() * 0.6 + 0.25
       });
     }
   }
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
 
     for (const s of stars) {
       ctx.beginPath();
+      ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fill();
 
