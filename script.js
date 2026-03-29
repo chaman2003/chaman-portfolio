@@ -39,73 +39,73 @@ function buildMotionProfile() {
   const profiles = {
     watch: {
       speed: 1.55,
-      intensity: 0.34,
-      sparkModulo: 14,
+      intensity: 0.3,
+      sparkModulo: 16,
       parallaxMinWidth: 9999,
       parallaxScale: 0,
       tiltMax: 0,
       magneticFactor: 0,
-      starCount: 20
+      starCount: 14
     },
     phone: {
       speed: 1.35,
-      intensity: 0.5,
-      sparkModulo: 10,
+      intensity: 0.42,
+      sparkModulo: 14,
       parallaxMinWidth: 9999,
       parallaxScale: 0,
       tiltMax: 0,
-      magneticFactor: 0.035,
-      starCount: 32
+      magneticFactor: 0.02,
+      starCount: 18
     },
     phablet: {
       speed: 1.2,
-      intensity: 0.65,
-      sparkModulo: 8,
+      intensity: 0.56,
+      sparkModulo: 12,
       parallaxMinWidth: 1400,
       parallaxScale: 0,
-      tiltMax: 3,
-      magneticFactor: 0.05,
-      starCount: 48
+      tiltMax: 2,
+      magneticFactor: 0.03,
+      starCount: 24
     },
     tablet: {
       speed: 1.1,
-      intensity: 0.8,
-      sparkModulo: 6,
+      intensity: 0.68,
+      sparkModulo: 10,
       parallaxMinWidth: 1300,
-      parallaxScale: 0.09,
-      tiltMax: 4,
-      magneticFactor: 0.06,
-      starCount: 66
+      parallaxScale: 0.06,
+      tiltMax: 3,
+      magneticFactor: 0.035,
+      starCount: 30
     },
     laptop: {
       speed: 1,
-      intensity: 0.92,
-      sparkModulo: 4,
+      intensity: 0.78,
+      sparkModulo: 8,
       parallaxMinWidth: 1200,
-      parallaxScale: 0.11,
-      tiltMax: 5,
-      magneticFactor: 0.07,
-      starCount: 84
+      parallaxScale: 0.07,
+      tiltMax: 3,
+      magneticFactor: 0.04,
+      starCount: 36
     },
     desktop: {
-      speed: 0.95,
-      intensity: 1,
-      sparkModulo: 3,
+      speed: 0.96,
+      intensity: 0.86,
+      sparkModulo: 6,
       parallaxMinWidth: 1200,
-      parallaxScale: 0.12,
-      tiltMax: 5,
-      magneticFactor: 0.07,
-      starCount: 95
+      parallaxScale: 0.08,
+      tiltMax: 3.2,
+      magneticFactor: 0.042,
+      starCount: 44
     },
     ultra: {
-      speed: 0.9,
-      intensity: 1.08,
-      sparkModulo: 2,
+      speed: 0.93,
+      intensity: 0.92,
+      sparkModulo: 4,
       parallaxMinWidth: 1300,
-      parallaxScale: 0.13,
-      tiltMax: 6,
-      magneticFactor: 0.08,
-      starCount: 110
+      parallaxScale: 0.09,
+      tiltMax: 4,
+      magneticFactor: 0.05,
+      starCount: 52
     }
   };
 
@@ -548,7 +548,17 @@ function updateScrollProgress() {
     backToTopBtn.classList.toggle('visible', scrollTop > 260);
   }
 }
-window.addEventListener('scroll', updateScrollProgress);
+let scrollTicking = false;
+function onScrollProgress() {
+  if (scrollTicking) return;
+  scrollTicking = true;
+  requestAnimationFrame(() => {
+    scrollTicking = false;
+    updateScrollProgress();
+  });
+}
+
+window.addEventListener('scroll', onScrollProgress, { passive: true });
 updateScrollProgress();
 
 backToTopBtn?.addEventListener('click', () => {
@@ -722,7 +732,7 @@ if (hasFinePointer) {
     if (!clickFxEl || !isMotionEnabled()) return;
 
     const now = performance.now();
-    if (now - lastTrailStamp <= 24) return;
+    if (now - lastTrailStamp <= 36) return;
 
     let speed = 0;
     let angleDeg = 0;
@@ -735,7 +745,7 @@ if (hasFinePointer) {
       speed = (distance / dt) * 1000;
       angleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
 
-      const bridgeSteps = Math.min(3, Math.floor(distance / 16));
+      const bridgeSteps = Math.min(1, Math.floor(distance / 24));
       for (let i = 1; i <= bridgeSteps; i++) {
         const t = i / (bridgeSteps + 1);
         const ix = lastTrailX + dx * t;

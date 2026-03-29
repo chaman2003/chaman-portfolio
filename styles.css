@@ -1436,13 +1436,18 @@ footer { text-align: center; color: var(--muted); padding-bottom: 1.6rem; }
 .repo-card,
 .skill-logo-card,
 .stat {
-  animation: border-glow calc(4.5s * var(--motion-speed)) ease-in-out infinite;
-  animation-play-state: var(--motion-play-state);
+  box-shadow: var(--shadow);
 }
 
-@keyframes border-glow {
-  0%, 100% { box-shadow: var(--shadow); }
-  50% { box-shadow: var(--shadow), 0 0 18px 0 var(--neon-glow); }
+@media (hover: hover) {
+  .project:hover,
+  .profile-card:hover,
+  .repo-card:hover,
+  .skill-logo-card:hover,
+  .stat:hover {
+    box-shadow: var(--shadow), 0 0 16px 0 var(--neon-glow);
+    transition: box-shadow 0.2s ease;
+  }
 }
 
 .hero,
@@ -1452,7 +1457,7 @@ footer { text-align: center; color: var(--muted); padding-bottom: 1.6rem; }
 .repo-card,
 .stat,
 .panel {
-  will-change: transform, opacity;
+  will-change: auto;
 }
 
 .reveal {
