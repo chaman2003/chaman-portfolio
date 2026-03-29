@@ -1,0 +1,20 @@
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; padding: 0; min-height: 100%; font-family: Inter, Segoe UI, sans-serif; }
+body { background: #070d1c; color: #eaf1ff; }
+
+.app { min-height: 100vh; }
+.app.dark { background: linear-gradient(180deg, #070d1c, #050916); color: #eaf1ff; }
+.app.light { background: #f3f7ff; color: #13244d; }
+
+.container { width: min(1200px, 92vw); margin: 0 auto; padding: 1rem 0 2rem; display: grid; gap: 1rem; }
+.panel { border: 1px solid rgba(122, 163, 238, 0.28); border-radius: 16px; background: rgba(10, 20, 45, 0.75); padding: 1rem; }
+.app.light .panel { background: #ffffff; border-color: rgba(67, 124, 216, 0.2); }
+.muted { color: #9eb6e7; }
+.app.light .muted { color: #3f5f97; }
+
+h1, h2, h3, h4 { margin: 0 0 .5rem; }
+
+.tags { display: flex; flex-wrap: wrap; gap: .45rem; }
+.tags span { border: 1px solid rgba(126, 170, 255, .4); border-radius: 999px; padding: .2rem .55rem; font-size: .78rem; }
+
+a { color: inherit; }
