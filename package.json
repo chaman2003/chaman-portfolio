@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "nodemon",
+    "dev:vite": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
+    "nodemon": "^3.1.10",
     "vite": "^5.4.10"
   }
 }

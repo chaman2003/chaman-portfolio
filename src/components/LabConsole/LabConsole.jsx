@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PROFILE } from '../../data/profile';
-import { askGroqWithRag } from '../../utils/rag';
+import { askGeminiWithRag } from '../../utils/rag';
 import './LabConsole.css';
 
 const QUICK = ['help', 'about', 'stack', 'contact', 'ai.summary', 'ai.projects', 'ai.skills'];
@@ -53,7 +53,7 @@ export default function LabConsole({ queuedTopCommand }) {
 
     setBusy(true);
     setOutput(`> ${command}\n\nthinking..`);
-    const answer = await askGroqWithRag(query, extraDocs);
+    const answer = await askGeminiWithRag(query, extraDocs);
     setOutput(`> ${command}\n\n${answer}`);
     setBusy(false);
   }

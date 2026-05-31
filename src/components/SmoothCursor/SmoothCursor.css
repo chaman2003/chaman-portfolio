@@ -1,0 +1,82 @@
+:root {
+  --smooth-cursor-height: 32px;
+  --smooth-cursor-tip-x: 50.1%;
+  --smooth-cursor-tip-y: 10%;
+  --smooth-cursor-grad-a: #b8e4ff;
+  --smooth-cursor-grad-b: #4fa3ff;
+  --smooth-cursor-grad-c: #6f81ff;
+  --smooth-cursor-stroke: #f5f8ff;
+  --smooth-cursor-glow: rgba(79, 163, 255, 0.55);
+}
+
+body[data-theme='light'] {
+  --smooth-cursor-grad-a: #5eb0ff;
+  --smooth-cursor-grad-b: #2b7de8;
+  --smooth-cursor-grad-c: #4f5fd4;
+  --smooth-cursor-stroke: #ffffff;
+  --smooth-cursor-glow: rgba(43, 125, 232, 0.45);
+}
+
+html[data-smooth-cursor] *,
+html[data-smooth-cursor] *::before,
+html[data-smooth-cursor] *::after {
+  cursor: none !important;
+}
+
+html[data-smooth-cursor] input,
+html[data-smooth-cursor] textarea,
+html[data-smooth-cursor] select {
+  cursor: text !important;
+}
+
+.smooth-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  transform: translate3d(-100px, -100px, 0);
+  --smooth-cursor-tilt: 0deg;
+  transition: opacity 0.12s ease;
+}
+
+.smooth-cursor--visible {
+  opacity: 1;
+}
+
+.smooth-cursor--pressed .smooth-cursor__svg {
+  filter: brightness(1.08) saturate(1.1);
+}
+
+.smooth-cursor--hidden {
+  opacity: 0 !important;
+}
+
+.smooth-cursor__glow {
+  position: absolute;
+  left: var(--smooth-cursor-tip-x);
+  top: var(--smooth-cursor-tip-y);
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--smooth-cursor-glow) 0%, transparent 72%);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.smooth-cursor__svg {
+  display: block;
+  height: var(--smooth-cursor-height);
+  width: auto;
+  transform: rotate(calc(-36deg + var(--smooth-cursor-tilt)));
+  transform-origin: var(--smooth-cursor-tip-x) var(--smooth-cursor-tip-y);
+  transition: transform 0.09s linear, filter 0.14s ease;
+  filter: drop-shadow(0 0 10px var(--smooth-cursor-glow));
+}
+
+html[data-smooth-cursor] [contenteditable='true'] {
+  cursor: text !important;
+}

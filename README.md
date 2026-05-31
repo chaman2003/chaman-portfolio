@@ -7,7 +7,7 @@ No legacy public asset references are used.
 - React 18
 - Vite
 - CSS imported in React
-- Env-based config for Groq + GitHub
+- Env-based config for Gemini + GitHub
 
 ## Run
 ```bash
@@ -23,8 +23,8 @@ npm run build
 ## Env
 Use `.env`:
 ```env
-VITE_GROQ_API_KEY=...
-VITE_GROQ_MODEL=llama-3.3-70b-versatile
+VITE_GEMINI_API_KEY=...
+VITE_GEMINI_MODEL=gemini-2.5-flash-lite
 VITE_GITHUB_USERNAME=chaman2003
 ```
 

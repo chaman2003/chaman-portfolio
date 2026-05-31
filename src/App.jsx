@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import parse from 'html-react-parser';
 import markup from './markup.html?raw';
 import { initPortfolioEffects } from './effects/portfolioEffects';
+import { SmoothCursor } from './components/SmoothCursor/SmoothCursor';
 import './styles/legacy.css';
 
 export default function App() {
@@ -13,5 +14,10 @@ export default function App() {
     initPortfolioEffects();
   }, []);
 
-  return <>{parse(markup)}</>;
+  return (
+    <>
+      <SmoothCursor />
+      {parse(markup)}
+    </>
+  );
 }

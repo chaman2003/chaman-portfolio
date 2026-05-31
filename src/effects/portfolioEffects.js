@@ -1,3 +1,5 @@
+import { askGeminiWithRag } from '../utils/rag.js';
+
 export function initPortfolioEffects() {
 const yearEl = document.getElementById('year');
 const typewriterEl = document.getElementById('typewriter');
@@ -7,7 +9,6 @@ const scrollProgressEl = document.getElementById('scrollProgress');
 const heroSceneEl = document.getElementById('heroScene');
 const themeToggleBtn = document.getElementById('themeToggle');
 const logoMarqueeEl = document.getElementById('logoMarquee');
-const clickFxEl = document.getElementById('clickFx');
 const backToTopBtn = document.getElementById('backToTop');
 const labOutputEl = document.getElementById('labOutput');
 const labButtons = Array.from(document.querySelectorAll('.lab-btn'));
@@ -274,12 +275,7 @@ if ('IntersectionObserver' in window) {
   sectionMap.forEach((s) => navObserver.observe(s.target));
 }
 
-// Intelligent terminal commands (Groq + local RAG)
-const GROQ_API_KEY =
-  window.__VRIK_RUNTIME__?.GROQ_API_KEY ||
-  localStorage.getItem('vrik_groq_key') ||
-  'REPLACE_WITH_GROQ_API_KEY';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+// Intelligent terminal commands (Gemini + local RAG)
 const GITHUB_TOKEN =
   window.__VRIK_RUNTIME__?.GITHUB_TOKEN ||
   localStorage.getItem('vrik_github_token') ||
@@ -341,75 +337,8 @@ const labAliases = {
   'achievements.top': 'achievements'
 };
 
-function tokenize(text) {
-  return String(text || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9+.#\s]/g, ' ')
-    .split(/\s+/)
-    .filter((t) => t.length > 2);
-}
-
 function getRagDocuments() {
   return [...resumeRagChunks, ...linkedinRagChunks, githubProfileChunk, ...githubRagChunks].filter(Boolean);
-}
-
-function retrieveRagContext(query, topK = 6) {
-  const docs = getRagDocuments();
-  if (!docs.length) return [];
-
-  const qTokens = tokenize(query);
-  const scored = docs.map((doc) => {
-    let score = 0;
-    const low = doc.toLowerCase();
-    qTokens.forEach((token) => {
-      if (low.includes(token)) score += token.length > 5 ? 2 : 1;
-    });
-    return { doc, score };
-  });
-
-  scored.sort((a, b) => b.score - a.score);
-  const best = scored.filter((d) => d.score > 0).slice(0, topK).map((d) => d.doc);
-  return best.length ? best : docs.slice(0, topK);
-}
-
-async function callGroqWithRag(query, { short = false } = {}) {
-  if (!GROQ_API_KEY || GROQ_API_KEY === 'REPLACE_WITH_GROQ_API_KEY') {
-    throw new Error('AI key not configured.');
-  }
-
-  const context = retrieveRagContext(query);
-  const payload = {
-    model: GROQ_MODEL,
-    temperature: 0.3,
-    max_tokens: short ? 220 : 450,
-    messages: [
-      {
-        role: 'system',
-        content: 'You are a concise portfolio assistant. Answer using only provided context. Keep responses accurate and professional.'
-      },
-      {
-        role: 'user',
-        content: `Question: ${query}\n\nContext:\n${context.join('\n\n')}`
-      }
-    ]
-  };
-
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${GROQ_API_KEY}`
-    },
-    body: JSON.stringify(payload)
-  });
-
-  if (!res.ok) {
-    const msg = await res.text();
-    throw new Error(`Groq request failed (${res.status}): ${msg.slice(0, 160)}`);
-  }
-
-  const data = await res.json();
-  return data?.choices?.[0]?.message?.content?.trim() || 'No response generated.';
 }
 
 function typeToElement(el, text) {
@@ -480,7 +409,11 @@ async function executeLabCommand(rawCommand, opts = { store: true, source: 'lab'
     try {
       terminalBusy = true;
       typeToLab(`> ${commandRaw}\n\nthinking..`);
-      const response = await callGroqWithRag(aiQuery);
+      const response = await askGeminiWithRag(aiQuery, getRagDocuments(), {
+        short: Boolean(aiPreset[normalized]),
+        throwErrors: true,
+        topK: 6
+      });
       typeToLab(`> ${commandRaw}\n\n${response}`);
     } catch (err) {
       typeToLab(`> ${commandRaw}\n\n${err.message}`);
@@ -647,156 +580,7 @@ function runTypewriter() {
 }
 runTypewriter();
 
-// Cursor trail (enhanced cinematic style)
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
-let lastTrailStamp = 0;
-let lastTrailMoveStamp = 0;
-let lastTrailX = null;
-let lastTrailY = null;
-let trailStepCounter = 0;
-
-function spawnTrailDot(x, y, speed = 0, angleDeg = 0) {
-  if (!clickFxEl) return;
-
-  const dot = document.createElement('span');
-  dot.className = 'cursor-trail-dot';
-  dot.style.left = `${x.toFixed(1)}px`;
-  dot.style.top = `${y.toFixed(1)}px`;
-
-  const speedBoost = Math.min(speed / 1200, 1);
-  const intensity = motionProfile?.intensity || 1;
-  const trailSize = (7.5 + Math.random() * 2.4 + speedBoost * 2.8) * (0.92 + intensity * 0.12);
-  const trailAlpha = Math.min(0.95, 0.52 + Math.random() * 0.2 + speedBoost * 0.18);
-  const trailDuration = (300 + Math.random() * 120 + speedBoost * 140) * (0.95 + intensity * 0.08);
-  const trailStretch = 1 + speedBoost * 0.8;
-  const drift = 1.5 + speedBoost * 2.8;
-  const rad = (angleDeg * Math.PI) / 180;
-  const trailDriftX = Math.cos(rad) * drift;
-  const trailDriftY = Math.sin(rad) * drift;
-  const trailHue = 196 + Math.random() * 24;
-
-  dot.style.setProperty('--trail-size', `${trailSize.toFixed(1)}px`);
-  dot.style.setProperty('--trail-alpha', `${trailAlpha.toFixed(2)}`);
-  dot.style.setProperty('--trail-duration', `${trailDuration.toFixed(0)}ms`);
-  dot.style.setProperty('--trail-stretch', `${trailStretch.toFixed(2)}`);
-  dot.style.setProperty('--trail-angle', `${angleDeg.toFixed(1)}deg`);
-  dot.style.setProperty('--trail-drift-x', `${trailDriftX.toFixed(2)}px`);
-  dot.style.setProperty('--trail-drift-y', `${trailDriftY.toFixed(2)}px`);
-  dot.style.setProperty('--trail-hue', `${trailHue.toFixed(0)}`);
-
-  clickFxEl.appendChild(dot);
-  setTimeout(() => dot.remove(), Math.round(trailDuration) + 120);
-}
-
-function spawnTrailSpark(x, y, speed = 0, angleDeg = 0) {
-  if (!clickFxEl) return;
-
-  const spark = document.createElement('span');
-  spark.className = 'cursor-trail-spark';
-  spark.style.left = `${x.toFixed(1)}px`;
-  spark.style.top = `${y.toFixed(1)}px`;
-
-  const speedBoost = Math.min(speed / 1300, 1);
-  const spread = 6 + speedBoost * 9;
-  const jitter = (Math.random() - 0.5) * 34;
-  const finalAngle = angleDeg + jitter;
-  const rad = (finalAngle * Math.PI) / 180;
-  const driftX = Math.cos(rad) * spread;
-  const driftY = Math.sin(rad) * spread;
-
-  spark.style.setProperty('--spark-drift-x', `${driftX.toFixed(2)}px`);
-  spark.style.setProperty('--spark-drift-y', `${driftY.toFixed(2)}px`);
-  spark.style.setProperty('--spark-size', `${(2.2 + Math.random() * 1.7 + speedBoost).toFixed(1)}px`);
-  spark.style.setProperty('--spark-duration', `${(240 + Math.random() * 120 + speedBoost * 120).toFixed(0)}ms`);
-
-  clickFxEl.appendChild(spark);
-  setTimeout(() => spark.remove(), 420);
-}
-
-function spawnTrailRing(x, y, speed = 0) {
-  if (!clickFxEl) return;
-
-  const ring = document.createElement('span');
-  ring.className = 'cursor-trail-ring';
-  ring.style.left = `${x.toFixed(1)}px`;
-  ring.style.top = `${y.toFixed(1)}px`;
-  const size = 8 + Math.min(speed / 180, 10);
-  ring.style.setProperty('--ring-size', `${size.toFixed(1)}px`);
-  ring.style.setProperty('--ring-duration', `${(420 + Math.min(speed / 3.8, 180)).toFixed(0)}ms`);
-
-  clickFxEl.appendChild(ring);
-  setTimeout(() => ring.remove(), 700);
-}
-
-if (hasFinePointer) {
-  window.addEventListener('mousemove', (e) => {
-    if (!clickFxEl || !isMotionEnabled()) return;
-
-    const now = performance.now();
-    if (now - lastTrailStamp <= 36) return;
-
-    let speed = 0;
-    let angleDeg = 0;
-
-    if (lastTrailX !== null && lastTrailY !== null) {
-      const dt = Math.max(now - lastTrailMoveStamp, 8);
-      const dx = e.clientX - lastTrailX;
-      const dy = e.clientY - lastTrailY;
-      const distance = Math.hypot(dx, dy);
-      speed = (distance / dt) * 1000;
-      angleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
-
-      const bridgeSteps = Math.min(1, Math.floor(distance / 24));
-      for (let i = 1; i <= bridgeSteps; i++) {
-        const t = i / (bridgeSteps + 1);
-        const ix = lastTrailX + dx * t;
-        const iy = lastTrailY + dy * t;
-        spawnTrailDot(ix, iy, speed * 0.8, angleDeg);
-      }
-    }
-
-    lastTrailStamp = now;
-    lastTrailMoveStamp = now;
-    lastTrailX = e.clientX;
-    lastTrailY = e.clientY;
-    trailStepCounter += 1;
-
-    spawnTrailDot(e.clientX, e.clientY, speed, angleDeg);
-
-    const sparkModulo = Math.max(2, motionProfile?.sparkModulo || 4);
-    if (trailStepCounter % sparkModulo === 0) {
-      spawnTrailSpark(e.clientX, e.clientY, speed, angleDeg);
-    }
-
-    if (speed > 980 && trailStepCounter % (sparkModulo + 1) === 0) {
-      spawnTrailSpark(e.clientX, e.clientY, speed * 0.9, angleDeg + 8);
-    }
-  });
-
-  window.addEventListener('pointerdown', (e) => {
-    if (!clickFxEl || !isMotionEnabled()) return;
-    spawnTrailRing(e.clientX, e.clientY, 1000);
-    for (let i = 0; i < 4; i++) {
-      spawnTrailSpark(e.clientX, e.clientY, 980, i * 90 + Math.random() * 22);
-    }
-  });
-
-  window.addEventListener('mouseleave', () => {
-    lastTrailX = null;
-    lastTrailY = null;
-    lastTrailMoveStamp = 0;
-  });
-}
-
-window.addEventListener('motionprofilechange', () => {
-  if (!isMotionEnabled() && clickFxEl) {
-    clickFxEl.replaceChildren();
-    lastTrailX = null;
-    lastTrailY = null;
-    lastTrailMoveStamp = 0;
-    trailStepCounter = 0;
-  }
-});
 
 // Hero parallax (ultra subtle to avoid overlap)
 window.addEventListener('mousemove', (e) => {
