@@ -15,7 +15,7 @@ export const PORTFOLIO_RAG_DOCS = [
   'Education - duration and score: Dec 2022 to May 2026 with CGPA 8.88.',
 
   'Experience - Cortex Craft AI: Software Engineer Intern from Jan 2026 to May 2026.',
-  'Experience - Cortex Craft AI work: AI-first POCs for Refyne, Pace Digitek, Surya Developers, Khincha Dental Centre, and DanceSing — WhatsApp/voice LLM agents, agentic & RAG workflows, secure APIs, real-time sockets.',
+  'Experience - Cortex Craft AI work: AI-first POCs for Refyne, Pace Digitek, Surya Developers, and Khincha Dental Centre — WhatsApp/voice LLM agents, agentic & RAG workflows, secure APIs, real-time sockets.',
   'Experience - Cortex Craft AI focus: Deployable prototypes with scalable architecture across client domains.',
 
   'Project - VOVIXA AI: Production voice AI platform with live phone agents, Twilio/Plivo, RAG, tool integrations, WebSocket audio streaming, barge-in, sub-500ms latency (Oct 2025 – Jan 2026).',

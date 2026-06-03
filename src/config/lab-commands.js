@@ -1,7 +1,7 @@
 export const RESUME_RAG_CHUNKS = [
   'Professional summary: AI & ML undergraduate (Honours) and full-stack developer specializing in agentic systems, voice AI, and RAG pipelines. Ships production-ready MERN, Python, and real-time WebSocket applications.',
   'Education: Bachelor of Engineering (B.E.) with Honours in Artificial Intelligence & Machine Learning at Vivekananda Institute of Technology, Bengaluru (Dec 2022 - May 2026), CGPA 8.88.',
-  'Internship: Cortex Craft AI (Jan 2026 - May 2026), Software Engineer Intern — AI POCs, voice/WhatsApp agents, RAG, sockets for Refyne, Pace Digitek, Surya Developers, Khincha Dental, DanceSing.',
+  'Internship: Cortex Craft AI (Jan 2026 - May 2026), Software Engineer Intern — AI POCs, voice/WhatsApp agents, RAG, sockets for Refyne, Pace Digitek, Surya Developers, Khincha Dental.',
   'Projects: VOVIXA AI (voice agents), PrintChakra AI (OCR + voice docs), Epsilora AI (AI LMS).',
   'Skills: JavaScript, TypeScript, Python, Java, React, Next.js, Redux, Node.js, Express, Flask, FastAPI, SQL, MongoDB, PostgreSQL, Vector DBs, WebSockets, Webhooks, LLMs, Agentic AI, Gen AI, RAG, LangChain, LangGraph, MCP, Prompt Engineering, PyTorch, Scikit-learn, NumPy, Pandas, Docker, Kubernetes, CI/CD, Linux, Git, GitHub, AWS, GCP, Cloud Run, Vercel, Render, Netlify, Heroku, VS Code, Postman, Cursor, Windsurf, GitHub Copilot, Claude Code, Codex, llama.cpp, vLLM, Ollama, Pipecat, Figma, N8N.',
   'Achievements: ₹4,500 Karnataka Govt sponsorship for PrintChakra AI, 1st rank in 3rd and 6th semester, SCIMAGINATION 2K23 and 2K25 2nd place.',

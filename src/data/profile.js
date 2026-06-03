@@ -17,7 +17,7 @@ export const EXPERIENCE = [
     period: 'Jan 2026 – May 2026',
     title: 'Software Engineer Intern',
     detail:
-      'Ships AI-first POCs to deployable prototypes: WhatsApp/voice LLM agents, agentic & RAG workflows, secure APIs, real-time sockets. Clients: Refyne, Pace Digitek, Surya Developers, Khincha Dental Centre, DanceSing.',
+      'Ships AI-first POCs to deployable prototypes: WhatsApp/voice LLM agents, agentic & RAG workflows, secure APIs, real-time sockets. Clients: Refyne, Pace Digitek, Surya Developers, Khincha Dental Centre.',
     bullets: [
       'AI-first POCs from idea to deployable full-stack prototypes.',
       'WhatsApp/voice LLM agents, agentic & RAG workflows, secure APIs, real-time sockets.',
