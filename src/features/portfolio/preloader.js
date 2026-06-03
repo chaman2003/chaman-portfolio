@@ -2,7 +2,7 @@ import { hardScrollToTop } from '../../lib/scroll-reset.js';
 
 export function initPreloader() {
   const preloaderDone = () => {
-    hardScrollToTop(window.__portfolioLenis ?? null);
+    hardScrollToTop(window.__portfolioMotionScroll ?? null);
     document.body.classList.add('loaded');
   };
 

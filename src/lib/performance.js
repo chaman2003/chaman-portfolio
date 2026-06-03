@@ -25,10 +25,15 @@ export function shouldRunStarfieldAnimation(isMotionEnabled) {
   return !isPerfLite();
 }
 
-/** Butter-smooth Lenis scroll (persists regardless of motion toggle). */
-export function shouldEnableLenisScroll() {
+/** Motion spring smooth scroll (persists regardless of motion toggle). */
+export function shouldEnableMotionSmoothScroll() {
   if (typeof window === 'undefined') return false;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
   if (isPerfLite()) return false;
   return true;
+}
+
+/** @deprecated Use shouldEnableMotionSmoothScroll */
+export function shouldEnableLenisScroll() {
+  return shouldEnableMotionSmoothScroll();
 }

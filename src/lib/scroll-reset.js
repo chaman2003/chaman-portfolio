@@ -1,5 +1,5 @@
 /** Force the page back to the top (beats browser scroll restoration on refresh). */
-export function hardScrollToTop(lenis) {
+export function hardScrollToTop(scrollEngine) {
   if (typeof window === 'undefined') return;
 
   if ('scrollRestoration' in history) {
@@ -10,18 +10,20 @@ export function hardScrollToTop(lenis) {
   document.body.scrollTop = 0;
   window.scrollTo(0, 0);
 
-  if (lenis) {
-    lenis.scrollTo(0, { immediate: true });
+  if (scrollEngine?.jump) {
+    scrollEngine.jump(0);
+  } else if (scrollEngine?.scrollTo) {
+    scrollEngine.scrollTo(0, { immediate: true });
   }
 }
 
-export function scheduleScrollToTop(lenis) {
-  hardScrollToTop(lenis);
+export function scheduleScrollToTop(scrollEngine) {
+  hardScrollToTop(scrollEngine);
 
   requestAnimationFrame(() => {
-    hardScrollToTop(lenis);
-    requestAnimationFrame(() => hardScrollToTop(lenis));
+    hardScrollToTop(scrollEngine);
+    requestAnimationFrame(() => hardScrollToTop(scrollEngine));
   });
 
-  window.addEventListener('load', () => hardScrollToTop(lenis), { once: true });
+  window.addEventListener('load', () => hardScrollToTop(scrollEngine), { once: true });
 }

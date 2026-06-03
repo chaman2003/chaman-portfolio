@@ -11,34 +11,41 @@
   <a class="brand" href="#home">CHAMAN<span>.X</span></a>
 
   <nav id="siteNav" aria-label="Primary navigation">
-    <button
-      id="navClose"
-      class="btn btn-ghost nav-close"
-      type="button"
-      aria-label="Close navigation menu"
-    >
-      Close ✕
-    </button>
-    <div id="navThemeToggleMount" class="nav-theme-toggle-mount"></div>
-    <button
-      id="motionToggleMenu"
-      class="btn btn-ghost nav-motion-toggle"
-      type="button"
-      data-motion-toggle
-      aria-label="Toggle motion effects"
-    >
-      Motion On
-    </button>
-    <a href="#about">About</a>
-    <a href="#experience">Experience</a>
-    <a href="#education">Education</a>
-    <a href="#certifications">Certs</a>
-    <a href="#achievements">Awards</a>
-    <a href="#projects">Projects</a>
-    <a href="#profiles">Profiles</a>
-    <a href="#timeline">Timeline</a>
-    <a href="#lab">Lab</a>
-    <a href="#contact">Contact</a>
+    <div class="nav-drawer-head">
+      <span class="nav-drawer-title">Navigate</span>
+      <button
+        id="navClose"
+        class="btn btn-ghost nav-close"
+        type="button"
+        aria-label="Close navigation menu"
+      >
+        Close ✕
+      </button>
+    </div>
+    <div class="nav-drawer-tools">
+      <div id="navThemeToggleMount" class="nav-theme-toggle-mount"></div>
+      <button
+        id="motionToggleMenu"
+        class="btn btn-ghost nav-motion-toggle"
+        type="button"
+        data-motion-toggle
+        aria-label="Toggle motion effects"
+      >
+        Motion On
+      </button>
+    </div>
+    <div class="nav-drawer-links" data-lenis-prevent>
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#education">Education</a>
+      <a href="#certifications">Certs</a>
+      <a href="#achievements">Awards</a>
+      <a href="#projects">Projects</a>
+      <a href="#profiles">Profiles</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#lab">Lab</a>
+      <a href="#contact">Contact</a>
+    </div>
   </nav>
 
   <div class="header-actions">
@@ -78,9 +85,8 @@
 
       <p class="subtitle">
         I’m <strong>Chaman S</strong> — Software Engineer (Full-Stack | MERN | Agentic AI),
-        pursuing a Bachelor of Engineering (B.E.) with Honours in Artificial Intelligence &amp;
-        Machine Learning at VKIT (CGPA 8.88). I ship production-ready voice AI, RAG pipelines, and
-        full-stack systems
+        pursuing B.E. with Honours in AI &amp; ML at VKIT (CGPA 8.88). I ship production-ready voice
+        AI, RAG pipelines, and full-stack systems
       </p>
 
       <div class="quick-meta">
@@ -136,7 +142,7 @@
           <span class="fetch-dots"><i></i><i></i><i></i></span>
           <span>chaman@archlinux:~ intelligent-shell</span>
         </div>
-        <div class="fetch-body">
+        <div class="fetch-body" data-lenis-prevent>
           <pre class="fetch-logo"><code>                   -`
                   .o+`
                  `ooo/
@@ -376,10 +382,11 @@ Status   : Building deployable AI products</code></pre>
           <div class="edu-card-top">
             <div>
               <p class="edu-degree">
-                Bachelor of Engineering <span class="edu-abbr">(B.E.)</span>
-                <span class="edu-honours">with Honours</span>
+                B.E. <span class="edu-honours">with Honours</span>
               </p>
-              <p class="edu-major">Artificial Intelligence &amp; Machine Learning</p>
+              <p class="edu-fullform">Bachelor of Engineering with Honours</p>
+              <p class="edu-major">AI &amp; ML</p>
+              <p class="edu-fullform">Artificial Intelligence &amp; Machine Learning</p>
               <p class="edu-school">Vivekananda Institute of Technology, Bengaluru</p>
             </div>
             <div class="edu-cgpa" aria-label="CGPA 8.88">
@@ -779,7 +786,7 @@ Status   : Building deployable AI products</code></pre>
             <span>vrik@chaman:~$ interactive-shell</span>
             <span class="lab-dot"></span>
           </div>
-          <pre id="labOutput">Type "help" or ask a question.</pre>
+          <pre id="labOutput" data-lenis-prevent>Type "help" or ask a question.</pre>
           <form
             id="labForm"
             class="lab-input-row"

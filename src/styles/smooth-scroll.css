@@ -1,19 +1,22 @@
-html.lenis-smooth {
+html.motion-smooth-scroll {
   scroll-behavior: auto !important;
 }
 
-html.lenis-smooth body {
+html.motion-smooth-scroll body {
   scroll-behavior: auto !important;
 }
 
-html.lenis.lenis-scrolling iframe {
-  pointer-events: none;
+[data-nested-scroll],
+[data-lenis-prevent] {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
-html.lenis-smooth #starfield,
-html.lenis-smooth .aurora,
-html.lenis-smooth .noise,
-html.lenis-smooth body::before {
+html.motion-smooth-scroll #starfield,
+html.motion-smooth-scroll .aurora,
+html.motion-smooth-scroll .noise,
+html.motion-smooth-scroll body::before {
   transform: translateZ(0);
   backface-visibility: hidden;
 }

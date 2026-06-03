@@ -111,8 +111,7 @@ code {
 }
 
 .nav-theme-toggler {
-  width: 100%;
-  margin-bottom: 0.34rem;
+  margin-bottom: 0;
 }
 
 .preloader {
@@ -366,10 +365,10 @@ body[data-theme='light'] .header {
   display: none;
 }
 
-.nav-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 78;
+  .nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 88;
   background: rgba(2, 8, 20, 0.28);
   opacity: 0;
   pointer-events: none;
@@ -699,13 +698,21 @@ body[data-theme='light'] .fetch-terminal {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 168, 255, 0.45) transparent;
 }
 
 .fetch-body::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  width: 5px;
+  height: 5px;
+}
+
+.fetch-body::-webkit-scrollbar-thumb {
+  background: rgba(124, 168, 255, 0.45);
+  border-radius: 999px;
 }
 
 .fetch-logo,
@@ -1226,29 +1233,31 @@ body[data-theme='light'] .exp-card-featured {
 .edu-degree {
   margin: 0;
   font-weight: 700;
-  font-size: 0.92rem;
+  font-size: 0.98rem;
   color: var(--text);
   line-height: 1.35;
 }
 
-.edu-abbr {
-  font-weight: 600;
+.edu-fullform {
+  margin: 0.12rem 0 0;
+  font-size: 0.78rem;
   color: var(--muted);
+  line-height: 1.35;
 }
 
 .edu-major {
-  margin: 0.2rem 0 0;
+  margin: 0.42rem 0 0;
   font-weight: 600;
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   color: var(--text);
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .edu-honours {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--accent);
-  margin-left: 0.35rem;
+  margin-left: 0.25rem;
 }
 
 .edu-school {
@@ -1728,6 +1737,11 @@ body[data-theme='light'] .lab-console {
   min-height: clamp(150px, 24vh, 210px);
   max-height: clamp(180px, 28vh, 260px);
   overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 168, 255, 0.45) transparent;
   white-space: pre-wrap;
   font-family: 'JetBrains Mono', Consolas, monospace;
   font-size: 0.8rem;
@@ -2257,6 +2271,17 @@ main > section {
   }
 }
 
+@media (min-width: 1024px) {
+  .nav-drawer-head,
+  .nav-drawer-tools {
+    display: none;
+  }
+
+  nav#siteNav .nav-drawer-links {
+    display: contents;
+  }
+}
+
 @media (max-width: 1023px) {
   body.gh-packed .github-cards {
     grid-template-columns: repeat(var(--gh-cols, 1), minmax(0, 1fr));
@@ -2309,13 +2334,13 @@ main > section {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    align-self: stretch;
     min-height: 40px;
-    padding: 0.42rem 0.58rem;
-    margin-bottom: 0.36rem;
+    padding: 0.4rem 0.55rem;
+    margin: 0;
     border: 1px solid rgba(124, 168, 255, 0.34);
-    background: rgba(79, 163, 255, 0.1);
+    background: rgba(79, 163, 255, 0.12);
     border-radius: 10px;
+    font-size: 0.78rem;
   }
 
   .nav-motion-toggle {
@@ -2324,11 +2349,12 @@ main > section {
     justify-content: center;
     width: 100%;
     min-height: 40px;
-    padding: 0.42rem 0.58rem;
-    margin-bottom: 0.34rem;
+    padding: 0.4rem 0.5rem;
+    margin: 0;
     border: 1px solid rgba(124, 168, 255, 0.34);
-    background: rgba(79, 163, 255, 0.1);
+    background: rgba(79, 163, 255, 0.12);
     border-radius: 10px;
+    font-size: 0.78rem;
   }
 
   .header-actions #motionToggle {
@@ -2342,52 +2368,100 @@ main > section {
   }
 
   .nav-theme-toggle-mount {
-    display: block;
+    display: flex;
+    min-width: 0;
   }
 
   .nav-theme-toggler {
     width: 100%;
-    min-height: 44px;
+    min-height: 40px;
     justify-content: center;
     border: 1px solid rgba(124, 168, 255, 0.34);
-    background: rgba(79, 163, 255, 0.1);
+    background: rgba(79, 163, 255, 0.12);
   }
 
   nav#siteNav {
     position: fixed;
     top: 0;
     right: 0;
-    z-index: 82;
-    width: min(340px, min(86vw, 100%));
-    height: 100vh;
+    z-index: 92;
+    width: min(320px, 88vw);
     height: 100dvh;
-    height: 100svh;
-    max-height: -webkit-fill-available;
+    max-height: 100svh;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.3rem;
-    padding: max(0.9rem, env(safe-area-inset-top, 0px))
-      max(0.78rem, env(safe-area-inset-right, 0px)) max(1rem, env(safe-area-inset-bottom, 0px))
-      0.78rem;
+    gap: 0;
+    padding: max(0.75rem, env(safe-area-inset-top, 0px))
+      max(0.72rem, env(safe-area-inset-right, 0px))
+      max(0.85rem, env(safe-area-inset-bottom, 0px)) 0.72rem;
     border-left: 1px solid var(--border);
-    border-top: 1px solid rgba(124, 168, 255, 0.26);
-    border-bottom: 1px solid rgba(124, 168, 255, 0.26);
-    border-top-left-radius: 16px;
-    border-bottom-left-radius: 16px;
-    background: linear-gradient(180deg, rgba(10, 27, 58, 0.82), rgba(8, 20, 46, 0.76));
-    box-shadow:
-      0 20px 44px rgba(2, 9, 23, 0.58),
-      inset 0 0 0 1px rgba(124, 168, 255, 0.14);
-    backdrop-filter: blur(10px);
-    overflow-y: hidden;
+    background: linear-gradient(180deg, rgba(10, 27, 58, 0.96), rgba(8, 20, 46, 0.94));
+    box-shadow: -12px 0 40px rgba(2, 9, 23, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow: hidden;
     overscroll-behavior: contain;
-    transform: translateX(100%);
+    transform: translateX(105%);
     visibility: hidden;
     pointer-events: none;
     transition:
-      transform 0.24s ease,
-      visibility 0.24s ease;
+      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0.28s ease;
+  }
+
+  .nav-drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-drawer-title {
+    font-family: Orbitron, sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .nav-drawer-tools {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(124, 168, 255, 0.22);
+  }
+
+  .nav-drawer-links {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.34rem;
+    padding-top: 0.15rem;
+    padding-right: 0.1rem;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(124, 168, 255, 0.4) transparent;
+  }
+
+  .nav-drawer-links::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .nav-drawer-links::-webkit-scrollbar-thumb {
+    background: rgba(124, 168, 255, 0.4);
+    border-radius: 999px;
   }
 
   body[data-theme='light'] nav#siteNav {
@@ -2397,17 +2471,19 @@ main > section {
       inset 0 0 0 1px rgba(31, 109, 224, 0.16);
   }
 
+  .nav-drawer-links a,
   nav#siteNav a {
     display: block;
     font-size: clamp(0.86rem, 2vw, 0.95rem);
-    padding: 0.55rem 0.62rem;
+    padding: 0.58rem 0.65rem;
     border-radius: 10px;
     border: 1px solid rgba(124, 168, 255, 0.24);
     background: rgba(79, 163, 255, 0.08);
+    text-align: left;
+    flex-shrink: 0;
     transition:
       background 0.2s ease,
-      border-color 0.2s ease,
-      transform 0.2s ease;
+      border-color 0.2s ease;
   }
 
   body[data-theme='light'] nav#siteNav a {
@@ -2415,13 +2491,16 @@ main > section {
     background: rgba(31, 109, 224, 0.07);
   }
 
+  .nav-drawer-links a:hover,
+  .nav-drawer-links a.active,
   nav#siteNav a:hover,
   nav#siteNav a.active {
     border-color: rgba(124, 168, 255, 0.5);
     background: rgba(79, 163, 255, 0.18);
-    transform: translateX(-2px);
   }
 
+  body[data-theme='light'] .nav-drawer-links a:hover,
+  body[data-theme='light'] .nav-drawer-links a.active,
   body[data-theme='light'] nav#siteNav a:hover,
   body[data-theme='light'] nav#siteNav a.active {
     border-color: rgba(31, 109, 224, 0.44);
@@ -2432,8 +2511,6 @@ main > section {
     transform: translateX(0);
     visibility: visible;
     pointer-events: auto;
-    overflow-y: auto;
-    scrollbar-gutter: stable;
   }
 
   body.nav-open .nav-backdrop {
@@ -2462,13 +2539,25 @@ main > section {
   }
 
   .fetch-body {
-    grid-template-columns: 1fr;
-    max-height: min(52vh, 420px);
+    grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
+    max-height: min(56vh, 460px);
     overflow-x: hidden;
+    gap: 0.3rem;
   }
 
   .fetch-logo {
-    display: none;
+    display: block;
+    font-size: clamp(0.42rem, 1.35vw, 0.52rem);
+    line-height: 1.12;
+    color: #7db2ff;
+    overflow: hidden;
+    max-height: 100%;
+    align-self: stretch;
+  }
+
+  .fetch-info {
+    overflow: visible;
+    max-height: none;
   }
 
   .lab-grid {
@@ -2524,16 +2613,11 @@ main > section {
   }
 
   .menu-toggle {
-    font-size: 0;
-    letter-spacing: 0;
-    min-width: 40px;
-    padding-inline: 0.45rem;
-  }
-
-  .menu-toggle::before {
-    content: '☰';
-    font-size: 1.05rem;
-    line-height: 1;
+    font-size: clamp(0.68rem, 2.4vw, 0.78rem);
+    letter-spacing: 0.02em;
+    min-width: 44px;
+    padding-inline: 0.5rem;
+    gap: 0.25rem;
   }
 
   .motion-toggle {
@@ -2643,8 +2727,16 @@ main > section {
   }
 
   nav#siteNav {
-    width: min(300px, 94vw);
-    padding: 0.72rem 0.62rem 0.9rem;
+    width: min(292px, 92vw);
+  }
+
+  .fetch-body {
+    grid-template-columns: minmax(0, 0.38fr) minmax(0, 1fr);
+    max-height: min(50vh, 400px);
+  }
+
+  .fetch-logo {
+    font-size: clamp(0.38rem, 1.2vw, 0.48rem);
   }
 
   .nav-close,
@@ -2770,10 +2862,25 @@ main > section {
     padding: 0.36rem;
   }
 
-  .fetch-logo,
+  .fetch-body {
+    grid-template-columns: 1fr;
+    max-height: min(48vh, 380px);
+  }
+
+  .fetch-logo {
+    display: block;
+    max-height: 4.8rem;
+    margin-bottom: 0.2rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(124, 168, 255, 0.2);
+    font-size: 0.44rem;
+    line-height: 1.1;
+  }
+
   .fetch-info {
     font-size: 0.56rem;
     line-height: 1.22;
+    max-height: none;
   }
 
   .quick-dock {

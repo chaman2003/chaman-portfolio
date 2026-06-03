@@ -40,7 +40,7 @@ export function createPortfolioContext() {
       busy: false,
     },
     scroll: {
-      lenis: null,
+      engine: null,
       scrollTo: null,
       destroy: () => {},
     },

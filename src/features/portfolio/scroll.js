@@ -1,23 +1,57 @@
-import Lenis from 'lenis';
-import { shouldEnableLenisScroll } from '../../lib/performance.js';
+import { motionValue } from 'motion';
+import { attachFollow } from 'motion-dom';
+import { createMotionSmoothScroll } from '../../lib/motion-smooth-scroll.js';
+import { shouldEnableMotionSmoothScroll } from '../../lib/performance.js';
 import { hardScrollToTop, scheduleScrollToTop } from '../../lib/scroll-reset.js';
 
 let activeScrollTeardown = null;
 
-const PLEASING_EASE = (t) => 1 - (1 - t) ** 4;
-const ANCHOR_SCROLL_DURATION = 2.35;
+const PROGRESS_SPRING = {
+  type: 'spring',
+  stiffness: 100,
+  damping: 30,
+  restDelta: 0.001,
+};
 
 function markNestedScrollAreas() {
   document
-    .querySelectorAll('.fetch-body, #labOutput, .lab-console, nav#siteNav')
+    .querySelectorAll('[data-nested-scroll], [data-lenis-prevent], .fetch-body, #labOutput, .nav-drawer-links')
     .forEach((el) => {
-      el.setAttribute('data-lenis-prevent', '');
+      el.setAttribute('data-nested-scroll', '');
     });
 }
 
-function getScrollMetrics(lenis) {
-  if (lenis) {
-    return { scroll: lenis.scroll, limit: lenis.limit };
+/** Let wheel/touch scroll stay inside terminal panels instead of moving the page. */
+function bindNestedScrollGuards() {
+  const nestedScrollers = document.querySelectorAll('[data-nested-scroll]');
+
+  nestedScrollers.forEach((el) => {
+    if (el.dataset.nestedScrollBound === '1') return;
+    el.dataset.nestedScrollBound = '1';
+
+    el.addEventListener(
+      'wheel',
+      (event) => {
+        if (el.scrollHeight <= el.clientHeight) return;
+        event.stopPropagation();
+      },
+      { passive: true }
+    );
+
+    el.addEventListener(
+      'touchmove',
+      (event) => {
+        if (el.scrollHeight <= el.clientHeight) return;
+        event.stopPropagation();
+      },
+      { passive: true }
+    );
+  });
+}
+
+function getScrollMetrics(engine) {
+  if (engine) {
+    return { scroll: engine.scroll, limit: engine.limit };
   }
 
   const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
@@ -32,25 +66,35 @@ export function initScroll(ctx) {
   }
 
   const { scrollProgress, backToTop } = ctx.dom;
-  const scrollApi = { lenis: null, scrollTo: null, destroy: () => {} };
+  const scrollApi = { engine: null, scrollTo: null, destroy: () => {} };
 
   hardScrollToTop();
   document.body.classList.remove('nav-open');
   if (scrollProgress) scrollProgress.style.transform = 'scaleX(0)';
   backToTop?.classList.remove('visible');
 
+  const rawProgress = motionValue(0);
+  const smoothProgress = motionValue(0);
+  const stopProgressFollow = attachFollow(smoothProgress, rawProgress, PROGRESS_SPRING);
+
   let lastProgressScale = -1;
   let lastBackToTopVisible = null;
+  let stopProgressListener = () => {};
+
+  if (scrollProgress) {
+    stopProgressListener = smoothProgress.on('change', (scale) => {
+      const clamped = Math.min(1, Math.max(0, scale));
+      if (Math.abs(clamped - lastProgressScale) > 0.001) {
+        lastProgressScale = clamped;
+        scrollProgress.style.transform = `scaleX(${clamped})`;
+      }
+    });
+  }
 
   const updateScrollProgress = () => {
-    const { scroll, limit } = getScrollMetrics(scrollApi.lenis);
+    const { scroll, limit } = getScrollMetrics(scrollApi.engine);
     const ratio = limit > 0 ? scroll / limit : 0;
-    const scale = Math.min(1, Math.max(0, ratio));
-
-    if (scrollProgress && Math.abs(scale - lastProgressScale) > 0.001) {
-      lastProgressScale = scale;
-      scrollProgress.style.transform = `scaleX(${scale})`;
-    }
+    rawProgress.set(Math.min(1, Math.max(0, ratio)));
 
     if (backToTop) {
       const showTop = scroll > 260;
@@ -62,16 +106,10 @@ export function initScroll(ctx) {
   };
 
   const scrollToTarget = (target, options = {}) => {
-    const duration = options.duration ?? ANCHOR_SCROLL_DURATION;
     const offset = options.offset ?? -12;
 
-    if (scrollApi.lenis) {
-      scrollApi.lenis.scrollTo(target, {
-        offset,
-        duration,
-        easing: options.easing ?? PLEASING_EASE,
-        lock: false,
-      });
+    if (scrollApi.engine) {
+      scrollApi.engine.scrollTo(target, { offset, immediate: options.immediate });
       return;
     }
 
@@ -96,71 +134,77 @@ export function initScroll(ctx) {
     el.classList.add('visible', 'is-revealed');
   });
 
-  const useLenis = shouldEnableLenisScroll();
+  const useMotionScroll = shouldEnableMotionSmoothScroll();
+  const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 
-  if (useLenis) {
-    markNestedScrollAreas();
+  markNestedScrollAreas();
+  bindNestedScrollGuards();
 
-    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-    const lenis = new Lenis({
-      autoRaf: true,
-      lerp: isCoarsePointer ? 0.09 : 0.062,
-      wheelMultiplier: 0.72,
-      touchMultiplier: 1.08,
-      smoothWheel: true,
-      syncTouch: isCoarsePointer,
-      syncTouchLerp: 0.065,
-      overscroll: true,
-      prevent: (node) => Boolean(node?.closest?.('[data-lenis-prevent]')),
+  if (useMotionScroll) {
+    const engine = createMotionSmoothScroll({
+      wheelMultiplier: isCoarsePointer ? 0.85 : 0.72,
+      touchMultiplier: isCoarsePointer ? 0.92 : 1.05,
     });
 
-    document.documentElement.classList.add('lenis', 'lenis-smooth');
-    scrollApi.lenis = lenis;
-    window.__portfolioLenis = lenis;
+    engine.bind({
+      smoothWheel: !isCoarsePointer,
+      smoothTouch: false,
+    });
 
-    lenis.on('scroll', onScrollProgress);
+    scrollApi.engine = engine;
+    window.__portfolioMotionScroll = engine;
+
+    let progressRaf = 0;
+    const trackProgress = () => {
+      onScrollProgress();
+      progressRaf = requestAnimationFrame(trackProgress);
+    };
+    progressRaf = requestAnimationFrame(trackProgress);
 
     if (window.gsap?.ticker && window.ScrollTrigger) {
       window.gsap.registerPlugin(window.ScrollTrigger);
-      lenis.on('scroll', window.ScrollTrigger.update);
+      window.gsap.ticker.add(onScrollProgress);
       window.gsap.ticker.lagSmoothing(0);
     }
 
     scrollApi.destroy = () => {
-      lenis.destroy();
-      document.documentElement.classList.remove('lenis', 'lenis-smooth');
-      scrollApi.lenis = null;
-      if (window.__portfolioLenis === lenis) {
-        window.__portfolioLenis = null;
+      cancelAnimationFrame(progressRaf);
+      engine.destroy();
+      document.documentElement.classList.remove('motion-smooth-scroll');
+      scrollApi.engine = null;
+      if (window.__portfolioMotionScroll === engine) {
+        window.__portfolioMotionScroll = null;
+      }
+      if (window.gsap?.ticker) {
+        window.gsap.ticker.remove(onScrollProgress);
       }
     };
 
-    hardScrollToTop(lenis);
-    lenis.resize();
-    scheduleScrollToTop(lenis);
+    hardScrollToTop(engine);
+    engine.resize();
+    scheduleScrollToTop(engine);
   } else {
     scheduleScrollToTop();
+    window.addEventListener('scroll', onScrollProgress, { passive: true });
+    updateScrollProgress();
   }
 
-  const onPageShow = (event) => {
-    hardScrollToTop(scrollApi.lenis);
+  const onPageShow = () => {
+    hardScrollToTop(scrollApi.engine);
     lastProgressScale = -1;
     lastBackToTopVisible = null;
     updateScrollProgress();
-
-    scrollApi.lenis?.resize();
+    scrollApi.engine?.resize();
   };
 
   window.addEventListener('pageshow', onPageShow);
 
-  if (!useLenis) {
-    window.addEventListener('scroll', onScrollProgress, { passive: true });
+  if (!useMotionScroll) {
+    updateScrollProgress();
   }
 
-  updateScrollProgress();
-
   backToTop?.addEventListener('click', () => {
-    scrollToTarget(0, { duration: 2.6, offset: 0 });
+    scrollToTarget(0, { offset: 0 });
   });
 
   document.addEventListener(
@@ -178,7 +222,7 @@ export function initScroll(ctx) {
       if (link.target === '_blank') return;
 
       event.preventDefault();
-      scrollToTarget(target, { offset: -16, duration: ANCHOR_SCROLL_DURATION });
+      scrollToTarget(target, { offset: -16 });
     },
     { capture: true }
   );
@@ -211,6 +255,11 @@ export function initScroll(ctx) {
   const baseDestroy = scrollApi.destroy;
   scrollApi.destroy = () => {
     window.removeEventListener('pageshow', onPageShow);
+    stopProgressFollow();
+    stopProgressListener();
+    if (!useMotionScroll) {
+      window.removeEventListener('scroll', onScrollProgress);
+    }
     baseDestroy();
   };
 
