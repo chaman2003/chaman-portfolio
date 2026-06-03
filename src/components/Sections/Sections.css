@@ -1,5 +1,0 @@
-.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: .65rem; }
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: .65rem; }
-.item { border: 1px solid rgba(124,170,255,.28); border-radius: 12px; background: rgba(9,20,45,.55); padding: .72rem; }
-.item p { margin: .25rem 0 .35rem; }
-.item a { color: #86b9ff; text-decoration: none; }

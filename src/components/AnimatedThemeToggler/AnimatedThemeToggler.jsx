@@ -8,20 +8,10 @@ function polygonCollapsed(cx, cy, vertexCount) {
   return `polygon(${pairs})`;
 }
 
-function getThemeTransitionClipPaths(
-  variant,
-  cx,
-  cy,
-  maxRadius,
-  viewportWidth,
-  viewportHeight
-) {
+function getThemeTransitionClipPaths(variant, cx, cy, maxRadius, viewportWidth, viewportHeight) {
   switch (variant) {
     case 'circle':
-      return [
-        `circle(0px at ${cx}px ${cy}px)`,
-        `circle(${maxRadius}px at ${cx}px ${cy}px)`,
-      ];
+      return [`circle(0px at ${cx}px ${cy}px)`, `circle(${maxRadius}px at ${cx}px ${cy}px)`];
     case 'square': {
       const halfW = Math.max(cx, viewportWidth - cx);
       const halfH = Math.max(cy, viewportHeight - cy);
@@ -93,10 +83,7 @@ function getThemeTransitionClipPaths(
       return [starPolygon(startR), starPolygon(R)];
     }
     default:
-      return [
-        `circle(0px at ${cx}px ${cy}px)`,
-        `circle(${maxRadius}px at ${cx}px ${cy}px)`,
-      ];
+      return [`circle(0px at ${cx}px ${cy}px)`, `circle(${maxRadius}px at ${cx}px ${cy}px)`];
   }
 }
 
@@ -219,10 +206,7 @@ export function AnimatedThemeToggler({
       y = top + height / 2;
     }
 
-    const maxRadius = Math.hypot(
-      Math.max(x, viewportWidth - x),
-      Math.max(y, viewportHeight - y)
-    );
+    const maxRadius = Math.hypot(Math.max(x, viewportWidth - x), Math.max(y, viewportHeight - y));
 
     if (typeof document.startViewTransition !== 'function') {
       applyThemeToDocument(nextTheme);
@@ -231,6 +215,7 @@ export function AnimatedThemeToggler({
     }
 
     isTransitioningRef.current = true;
+    document.documentElement.dataset.smoothCursorLock = 'theme';
 
     const clipPath = getThemeTransitionClipPaths(
       shape,
@@ -248,6 +233,7 @@ export function AnimatedThemeToggler({
 
     const cleanup = () => {
       delete root.dataset.magicuiThemeVt;
+      delete root.dataset.smoothCursorLock;
       root.style.removeProperty('--magicui-theme-toggle-vt-duration');
       root.style.removeProperty('--magicui-theme-vt-clip-from');
     };

@@ -1,5 +1,0 @@
-.main-skill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: .65rem; margin: .7rem 0; }
-.main-skill-card { border: 1px solid rgba(124,170,255,.32); border-radius: 12px; padding: .75rem; background: rgba(9,22,48,.6); }
-.main-skill-card h4 { margin-bottom: .25rem; }
-.main-skill-card p { margin: 0; font-size: .88rem; }
-.all-skills { margin-top: .5rem; }

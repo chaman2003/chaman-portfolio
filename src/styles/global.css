@@ -1,10 +1,32 @@
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   padding: 0;
-  min-height: 100%;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+}
+
+/* Single page scrollbar on html only (avoid nested scroll on body/main) */
+html {
+  overflow-x: clip;
+  overflow-y: scroll;
+  min-height: 100%;
+  max-width: 100vw;
+}
+
+body {
+  overflow-x: clip;
+  overflow-y: visible;
+  min-height: 100%;
+  max-width: 100vw;
+}
+
+#root {
+  overflow-x: clip;
+  overflow-y: visible;
+  min-width: 0;
+  max-width: 100vw;
 }
 
 * {
@@ -17,6 +39,13 @@ html, body, #root {
   mix-blend-mode: normal;
 }
 
-html[data-magicui-theme-vt="active"]::view-transition-group(root) {
+html[data-magicui-theme-vt='active']::view-transition-group(root) {
   animation-duration: var(--magicui-theme-toggle-vt-duration);
+}
+
+html[data-smooth-cursor]::view-transition,
+html[data-smooth-cursor]::view-transition-group(root),
+html[data-smooth-cursor]::view-transition-old(root),
+html[data-smooth-cursor]::view-transition-new(root) {
+  cursor: none !important;
 }

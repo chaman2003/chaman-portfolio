@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import './styles/global.css';
+import App from './app/App.jsx';
+import './styles/index.css';
 
 try {
   if (localStorage.getItem('theme') === 'light') {

@@ -1,6 +1,0 @@
-.header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .8rem; }
-.brand { font-weight: 800; letter-spacing: .04em; }
-.header nav { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; }
-.header nav a { text-decoration: none; opacity: .9; font-size: .92rem; }
-.header button { border: 1px solid rgba(126,170,255,.45); background: transparent; color: inherit; border-radius: 10px; padding: .45rem .6rem; cursor: pointer; }
-@media (max-width: 760px) { .header { grid-template-columns: 1fr; justify-items: start; } }

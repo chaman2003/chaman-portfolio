@@ -54,5 +54,5 @@ export const PORTFOLIO_RAG_DOCS = [
   'Timeline highlight 2025: Built PrintChakra AI with OCR, Whisper, and Socket.IO workflow pipeline.',
   'Timeline highlight 2026: Working at Cortex Craft AI on RAG and agentic architecture for client-focused AI systems.',
 
-  'Response style preference for portfolio assistant: Answer in a human, concise, confident way with concrete project and impact details when available.'
+  'Response style preference for portfolio assistant: Answer in a human, concise, confident way with concrete project and impact details when available.',
 ];
