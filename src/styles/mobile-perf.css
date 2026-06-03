@@ -24,26 +24,41 @@ html.mobile-touch #scrollProgress {
   will-change: auto;
 }
 
-/* Fixed, opaque header on phones — always visible while scrolling */
+/* Fixed, opaque header bar on phones — always visible while scrolling */
 @media (max-width: 1023px) {
-  .header {
+  .site-topbar {
     position: fixed;
     top: max(6px, env(safe-area-inset-top, 0px));
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    width: min(var(--container-max), calc(100% - (var(--container-padding) * 2)));
-    max-width: calc(100vw - (var(--container-padding) * 2));
+    left: max(var(--container-padding), env(safe-area-inset-left, 0px));
+    right: max(var(--container-padding), env(safe-area-inset-right, 0px));
     z-index: 110;
+    width: auto;
+    max-width: none;
     margin: 0;
+    padding: 0;
+    transform: none;
+    pointer-events: none;
+  }
+
+  .site-topbar .header {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    pointer-events: auto;
     background: rgba(9, 24, 52, 0.96) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     border: 1px solid rgba(124, 168, 255, 0.38);
     box-shadow: 0 10px 32px rgba(2, 9, 23, 0.48);
+    overflow: visible;
   }
 
-  body[data-theme='light'] .header {
+  body[data-theme='light'] .site-topbar .header {
     background: rgba(255, 255, 255, 0.96) !important;
     border-color: rgba(31, 109, 224, 0.28);
     box-shadow: 0 10px 28px rgba(19, 49, 102, 0.14);
@@ -53,8 +68,13 @@ html.mobile-touch #scrollProgress {
     padding-top: var(--mobile-header-offset, 5.25rem);
   }
 
-  body.nav-open nav#siteNav {
+  body.nav-open .site-topbar {
     z-index: 120;
+    pointer-events: auto;
+  }
+
+  body.nav-open nav#siteNav {
+    z-index: 125;
   }
 
   .nav-backdrop {

@@ -20,10 +20,10 @@ export function initPortfolioEffects() {
   initPreloader();
   initNavigation(ctx);
 
+  const topbarEl = document.querySelector('.site-topbar');
   const headerEl = document.querySelector('.header');
-  if (headerEl) {
-    headerEl.style.transform = 'none';
-  }
+  if (topbarEl) topbarEl.style.transform = 'none';
+  if (headerEl) headerEl.style.transform = 'none';
 
   const heroScene = document.getElementById('heroScene');
   if (heroScene) {

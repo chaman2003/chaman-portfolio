@@ -49,10 +49,12 @@ export function initNavigation(ctx) {
       return;
     }
 
+    const topbar = document.querySelector('.site-topbar');
     const header = document.querySelector('.header');
-    if (!header) return;
+    const measureEl = topbar || header;
+    if (!measureEl) return;
 
-    const offset = Math.ceil(header.getBoundingClientRect().height + 14);
+    const offset = Math.ceil(measureEl.getBoundingClientRect().height + 14);
     document.documentElement.style.setProperty('--mobile-header-offset', `${offset}px`);
   };
 

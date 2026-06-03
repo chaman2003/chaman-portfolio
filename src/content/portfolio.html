@@ -7,8 +7,33 @@
 <div class="aurora aurora-a" aria-hidden="true"></div>
 <div class="aurora aurora-b" aria-hidden="true"></div>
 <div class="noise" aria-hidden="true"></div>
-<header class="header glass">
-  <a class="brand" href="#home">CHAMAN<span>.X</span></a>
+<div class="site-topbar">
+  <header class="header glass">
+    <a class="brand" href="#home">CHAMAN<span>.X</span></a>
+
+    <div class="header-actions">
+      <button
+        id="menuToggle"
+        class="btn btn-ghost menu-toggle"
+        type="button"
+        aria-label="Open navigation menu"
+        aria-controls="siteNav"
+        aria-expanded="false"
+      >
+        ☰ Menu
+      </button>
+      <div id="themeToggleMount" class="theme-toggle-mount"></div>
+      <button
+        id="motionToggle"
+        class="btn btn-ghost motion-toggle"
+        type="button"
+        data-motion-toggle
+        aria-label="Toggle motion effects"
+      >
+        Motion On
+      </button>
+    </div>
+  </header>
 
   <nav id="siteNav" aria-label="Primary navigation">
     <div class="nav-drawer-head">
@@ -47,30 +72,7 @@
       <a href="#contact">Contact</a>
     </div>
   </nav>
-
-  <div class="header-actions">
-    <button
-      id="menuToggle"
-      class="btn btn-ghost menu-toggle"
-      type="button"
-      aria-label="Open navigation menu"
-      aria-controls="siteNav"
-      aria-expanded="false"
-    >
-      ☰ Menu
-    </button>
-    <div id="themeToggleMount" class="theme-toggle-mount"></div>
-    <button
-      id="motionToggle"
-      class="btn btn-ghost motion-toggle"
-      type="button"
-      data-motion-toggle
-      aria-label="Toggle motion effects"
-    >
-      Motion On
-    </button>
-  </div>
-</header>
+</div>
 
 <div id="navBackdrop" class="nav-backdrop" aria-hidden="true"></div>
 

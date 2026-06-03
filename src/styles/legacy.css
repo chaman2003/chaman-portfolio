@@ -267,10 +267,20 @@ body[data-theme='light']::before {
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow);
 }
-.header {
+.site-topbar {
   width: min(var(--container-max), calc(100% - (var(--container-padding) * 2)));
   max-width: var(--container-max);
   margin: var(--space-2) auto;
+  position: sticky;
+  top: max(6px, env(safe-area-inset-top, 0px));
+  z-index: 90;
+  isolation: isolate;
+}
+
+.header {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   border-radius: 18px;
   background: linear-gradient(180deg, rgba(9, 24, 52, 0.42), rgba(6, 16, 36, 0.34));
   backdrop-filter: blur(14px) saturate(120%);
@@ -280,14 +290,12 @@ body[data-theme='light']::before {
   align-items: center;
   justify-content: space-between;
   gap: 0.8rem;
-  position: sticky;
-  top: max(6px, env(safe-area-inset-top, 0px));
-  z-index: 90;
+  position: relative;
   transform: none;
   isolation: isolate;
 }
 
-.header > nav#siteNav {
+.site-topbar > nav#siteNav {
   flex: 1 1 auto;
   justify-content: center;
   min-width: 0;
@@ -295,6 +303,39 @@ body[data-theme='light']::before {
 
 body[data-theme='light'] .header {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(243, 248, 255, 0.58));
+}
+
+@media (min-width: 1024px) {
+  .site-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: clamp(0.5rem, 1.4vw, 0.72rem) clamp(0.65rem, 1.8vw, 1rem);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(9, 24, 52, 0.42), rgba(6, 16, 36, 0.34));
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+  }
+
+  body[data-theme='light'] .site-topbar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(243, 248, 255, 0.58));
+  }
+
+  .site-topbar .header {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  body[data-theme='light'] .site-topbar .header {
+    background: transparent;
+  }
 }
 
 .brand {
@@ -2143,6 +2184,7 @@ main > section {
   content-visibility: visible;
 }
 
+.site-topbar,
 .header,
 .hero,
 #home > section:first-of-type {
@@ -2159,6 +2201,14 @@ main > section {
     contain-intrinsic-size: auto;
   }
 
+  .site-topbar {
+    width: auto;
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: 0;
+    box-sizing: border-box;
+  }
+
   .header,
   main {
     width: 100%;
@@ -2169,6 +2219,7 @@ main > section {
     box-sizing: border-box;
   }
 
+  .site-topbar,
   .header,
   main,
   .hero,
@@ -2309,13 +2360,23 @@ main > section {
     grid-template-columns: repeat(var(--gh-cols, 1), minmax(0, 1fr));
   }
 
+  .site-topbar {
+    display: block;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
-    justify-content: stretch;
+    justify-content: space-between;
     gap: 0.5rem;
     flex-wrap: nowrap;
+    padding-inline: clamp(0.65rem, 1.8vw, 1rem);
   }
 
   .header > .brand {
@@ -2325,7 +2386,7 @@ main > section {
     white-space: nowrap;
   }
 
-  .header > nav#siteNav {
+  .site-topbar > nav#siteNav {
     position: fixed;
     flex: none;
   }
@@ -2750,11 +2811,13 @@ main > section {
     --container-padding: clamp(0.75rem, 5vw, 1.1rem);
   }
 
-  .header {
+  .site-topbar {
     top: 4px;
+  }
+
+  .header {
     padding-block: 0.45rem;
-    padding-inline: max(var(--container-padding), env(safe-area-inset-left, 0px))
-      max(var(--container-padding), env(safe-area-inset-right, 0px));
+    padding-inline: clamp(0.65rem, 1.8vw, 1rem);
   }
 
   .brand {
