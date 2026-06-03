@@ -1226,15 +1226,29 @@ body[data-theme='light'] .exp-card-featured {
 .edu-degree {
   margin: 0;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: var(--text);
+  line-height: 1.35;
+}
+
+.edu-abbr {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.edu-major {
+  margin: 0.2rem 0 0;
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--text);
+  line-height: 1.4;
 }
 
 .edu-honours {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--accent);
-  margin-left: 0.15rem;
+  margin-left: 0.35rem;
 }
 
 .edu-school {
@@ -2048,30 +2062,6 @@ footer {
   transform: none;
 }
 
-.js-reveal .reveal {
-  opacity: 0;
-  transform: translate3d(0, 28px, 0);
-  transition: none;
-  content-visibility: visible;
-  contain: layout style;
-  backface-visibility: hidden;
-}
-
-.js-reveal .reveal.visible {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-  transition:
-    opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.js-reveal .reveal.is-revealed {
-  opacity: 1;
-  transform: none;
-  transition: none;
-  contain: none;
-}
-
 .tilt {
   transform-style: preserve-3d;
   transition: transform 0.2s ease;
@@ -2086,10 +2076,6 @@ footer {
     transition-duration: 0.01ms !important;
   }
 
-  .js-reveal .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-  }
 }
 
 /* Performance: trim expensive paints when motion is off or device is in lite mode */

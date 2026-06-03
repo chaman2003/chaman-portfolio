@@ -163,7 +163,7 @@ export const ALL_SKILLS = [
 ];
 
 export const RESUME_RAG = [
-  'B.E in AI & ML (Honours) at Vivekananda Institute of Technology, Bengaluru — Dec 2022 to May 2026, CGPA 8.88.',
+  'Bachelor of Engineering (B.E.) with Honours in Artificial Intelligence & Machine Learning at Vivekananda Institute of Technology, Bengaluru — Dec 2022 to May 2026, CGPA 8.88.',
   'Internship: Cortex Craft AI (Jan 2026 – May 2026), Software Engineer Intern — AI POCs, voice/WhatsApp agents, RAG, sockets.',
   'Projects: VOVIXA AI (voice agents), PrintChakra AI (OCR + voice docs), Epsilora AI (AI LMS).',
   'Certifications: CS50x, MERN (Edunet), AWS Cloud, Google Cybersecurity, Gen AI/LLM/RAG, Java (NPTEL).',

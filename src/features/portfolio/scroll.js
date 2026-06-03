@@ -1,10 +1,6 @@
 import Lenis from 'lenis';
 import { shouldEnableLenisScroll } from '../../lib/performance.js';
-import {
-  hardScrollToTop,
-  resetRevealElements,
-  scheduleScrollToTop,
-} from '../../lib/scroll-reset.js';
+import { hardScrollToTop, scheduleScrollToTop } from '../../lib/scroll-reset.js';
 
 let activeScrollTeardown = null;
 
@@ -96,20 +92,9 @@ export function initScroll(ctx) {
     });
   };
 
-  const reveals = document.querySelectorAll('.reveal');
-  const revealElements = Array.from(reveals);
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  resetRevealElements(revealElements);
-  document.body.classList.remove('js-reveal');
-
-  let revealObserver = null;
-
-  const lockRevealVisible = (el) => {
-    if (el.classList.contains('is-revealed')) return;
+  document.querySelectorAll('.reveal').forEach((el) => {
     el.classList.add('visible', 'is-revealed');
-    revealObserver?.unobserve(el);
-  };
+  });
 
   const useLenis = shouldEnableLenisScroll();
 
@@ -163,15 +148,6 @@ export function initScroll(ctx) {
     lastBackToTopVisible = null;
     updateScrollProgress();
 
-    if (event.persisted) {
-      resetRevealElements(revealElements);
-      document.body.classList.remove('js-reveal');
-      if (!prefersReducedMotion && revealElements.length) {
-        document.body.classList.add('js-reveal');
-        revealElements.forEach((el) => revealObserver?.observe(el));
-      }
-    }
-
     scrollApi.lenis?.resize();
   };
 
@@ -206,41 +182,6 @@ export function initScroll(ctx) {
     },
     { capture: true }
   );
-
-  if (revealElements.length) {
-    if (prefersReducedMotion) {
-      revealElements.forEach((el) => lockRevealVisible(el));
-    } else {
-      document.body.classList.add('js-reveal');
-    }
-
-    revealElements.forEach((el) => {
-      el.addEventListener(
-        'transitionend',
-        (event) => {
-          if (event.propertyName === 'opacity' || event.propertyName === 'transform') {
-            lockRevealVisible(el);
-          }
-        },
-        { passive: true }
-      );
-    });
-
-    if (!prefersReducedMotion && 'IntersectionObserver' in window) {
-      revealObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) lockRevealVisible(entry.target);
-          });
-        },
-        {
-          threshold: 0.12,
-          rootMargin: '0px 0px -4% 0px',
-        }
-      );
-      revealElements.forEach((el) => revealObserver.observe(el));
-    }
-  }
 
   const counters = document.querySelectorAll('[data-counter]');
   const counterObserver = new IntersectionObserver(

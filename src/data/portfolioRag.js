@@ -11,7 +11,7 @@ export const PORTFOLIO_RAG_DOCS = [
   'Hiring and collaboration: Open to internships, collaborations, and impactful product engineering roles.',
   'Hiring preference: Best way to reach out is via email or LinkedIn with role details, expected impact, and timeline.',
 
-  'Education - degree: B.E in Artificial Intelligence and Machine Learning (Honours) at Vivekananda Institute of Technology, Bengaluru.',
+  'Education - degree: Bachelor of Engineering (B.E.) with Honours in Artificial Intelligence and Machine Learning at Vivekananda Institute of Technology, Bengaluru.',
   'Education - duration and score: Dec 2022 to May 2026 with CGPA 8.88.',
 
   'Experience - Cortex Craft AI: Software Engineer Intern from Jan 2026 to May 2026.',

@@ -15,12 +15,6 @@ export function hardScrollToTop(lenis) {
   }
 }
 
-export function resetRevealElements(elements = []) {
-  elements.forEach((el) => {
-    el.classList.remove('visible', 'is-revealed');
-  });
-}
-
 export function scheduleScrollToTop(lenis) {
   hardScrollToTop(lenis);
 

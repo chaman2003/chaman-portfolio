@@ -63,22 +63,6 @@ export function initGsap(ctx) {
       stagger: 0.12 * speed,
     });
 
-    window.gsap.utils
-      .toArray('.project, .profile-card, .timeline-item, .stat, .skill-logo-card, .exp-card')
-      .forEach((el) => {
-        window.gsap.from(el, {
-          y: 42,
-          opacity: 0,
-          duration: 1.35 * speed,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 88%',
-            toggleActions: 'play none none none',
-            once: true,
-          },
-        });
-      });
   };
 
   window.addEventListener('motionprofilechange', () => {
