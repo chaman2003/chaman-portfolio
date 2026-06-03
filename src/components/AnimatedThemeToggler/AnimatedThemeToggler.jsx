@@ -148,7 +148,8 @@ function SunIcon() {
 
 export function AnimatedThemeToggler({
   className,
-  duration = 400,
+  duration = 800,
+  delay = 200,
   variant = 'circle',
   fromCenter = false,
   theme,
@@ -235,11 +236,13 @@ export function AnimatedThemeToggler({
     const root = document.documentElement;
     root.dataset.magicuiThemeVt = 'active';
     root.style.setProperty('--magicui-theme-toggle-vt-duration', `${duration}ms`);
+    root.style.setProperty('--magicui-theme-toggle-vt-delay', `${delay}ms`);
     root.style.setProperty('--magicui-theme-vt-clip-from', clipPath[0]);
 
     const cleanup = () => {
       delete root.dataset.magicuiThemeVt;
       root.style.removeProperty('--magicui-theme-toggle-vt-duration');
+      root.style.removeProperty('--magicui-theme-toggle-vt-delay');
       root.style.removeProperty('--magicui-theme-vt-clip-from');
     };
 
@@ -260,6 +263,7 @@ export function AnimatedThemeToggler({
           { clipPath },
           {
             duration,
+            delay,
             easing: shape === 'star' ? 'linear' : 'ease-in-out',
             fill: 'forwards',
             pseudoElement: '::view-transition-new(root)',
@@ -267,7 +271,7 @@ export function AnimatedThemeToggler({
         );
       });
     }
-  }, [shape, fromCenter, duration, isDark, isControlled, onThemeChange]);
+  }, [shape, fromCenter, duration, delay, isDark, isControlled, onThemeChange]);
 
   return (
     <button

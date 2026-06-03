@@ -19,4 +19,5 @@ html, body, #root {
 
 html[data-magicui-theme-vt="active"]::view-transition-group(root) {
   animation-duration: var(--magicui-theme-toggle-vt-duration);
+  animation-delay: var(--magicui-theme-toggle-vt-delay, 0ms);
 }
