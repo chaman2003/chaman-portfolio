@@ -1,2 +1,4 @@
+@import 'lenis/dist/lenis.css';
 @import './global.css';
 @import './legacy.css';
+@import './smooth-scroll.css';

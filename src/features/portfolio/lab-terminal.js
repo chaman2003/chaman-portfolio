@@ -103,7 +103,11 @@ export function initLabTerminal(ctx) {
     if (!cmd.trim()) return;
     executeLabCommand(cmd, { source });
     if (source === 'top') {
-      document.getElementById('lab')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (ctx.scroll?.scrollTo) {
+        ctx.scroll.scrollTo('#lab', { duration: 2.4, offset: -24 });
+      } else {
+        document.getElementById('lab')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
     if (inputEl) inputEl.value = '';
   };

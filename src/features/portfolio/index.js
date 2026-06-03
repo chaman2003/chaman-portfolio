@@ -28,10 +28,6 @@ export function initPortfolioEffects() {
     heroScene.style.transform = '';
   }
 
-  window.scrollTo(0, 0);
-  document.documentElement.scrollLeft = 0;
-  document.body.scrollLeft = 0;
-
   if (ctx.dom.year) {
     ctx.dom.year.textContent = String(new Date().getFullYear());
   }

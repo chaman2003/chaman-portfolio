@@ -1,9 +1,11 @@
 const FEATURED_REPO_NAMES = new Set([
   'epsiloraai',
+  'epsilora-ai',
   'printchakraai',
   'printchakra',
-  'peakhive',
-  'tictactoeai',
+  'printchakra-ai',
+  'medchat-ai',
+  'agentic-ai-interview-materials',
 ]);
 
 const GITHUB_TOKEN =

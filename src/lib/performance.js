@@ -24,3 +24,11 @@ export function shouldRunStarfieldAnimation(isMotionEnabled) {
   if (document.hidden) return false;
   return !isPerfLite();
 }
+
+/** Butter-smooth Lenis scroll (persists regardless of motion toggle). */
+export function shouldEnableLenisScroll() {
+  if (typeof window === 'undefined') return false;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  if (isPerfLite()) return false;
+  return true;
+}

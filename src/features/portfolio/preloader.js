@@ -1,5 +1,11 @@
+import { hardScrollToTop } from '../../lib/scroll-reset.js';
+
 export function initPreloader() {
-  const preloaderDone = () => document.body.classList.add('loaded');
+  const preloaderDone = () => {
+    hardScrollToTop(window.__portfolioLenis ?? null);
+    document.body.classList.add('loaded');
+  };
+
   window.addEventListener('load', () => setTimeout(preloaderDone, 420));
   setTimeout(preloaderDone, 1800);
 }

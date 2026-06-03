@@ -1,0 +1,19 @@
+html.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+html.lenis-smooth body {
+  scroll-behavior: auto !important;
+}
+
+html.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+html.lenis-smooth #starfield,
+html.lenis-smooth .aurora,
+html.lenis-smooth .noise,
+html.lenis-smooth body::before {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

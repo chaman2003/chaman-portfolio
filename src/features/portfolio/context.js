@@ -39,6 +39,11 @@ export function createPortfolioContext() {
       historyCursor: -1,
       busy: false,
     },
+    scroll: {
+      lenis: null,
+      scrollTo: null,
+      destroy: () => {},
+    },
     isMotionEnabled: () => false,
     syncMotionProfile: () => {},
   };

@@ -67,13 +67,13 @@ export function initGsap(ctx) {
       .toArray('.project, .profile-card, .timeline-item, .stat, .skill-logo-card, .exp-card')
       .forEach((el) => {
         window.gsap.from(el, {
-          y: 26,
+          y: 42,
           opacity: 0,
-          duration: 0.8 * speed,
-          ease: 'power3.out',
+          duration: 1.35 * speed,
+          ease: 'power4.out',
           scrollTrigger: {
             trigger: el,
-            start: 'top 85%',
+            start: 'top 88%',
             toggleActions: 'play none none none',
             once: true,
           },
