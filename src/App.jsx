@@ -15,23 +15,11 @@ function readStoredTheme() {
   }
 }
 
-function applyTheme(theme) {
-  if (theme === 'light') {
-    document.body.setAttribute('data-theme', 'light');
-  } else {
-    document.body.removeAttribute('data-theme');
-  }
-}
-
 export default function App() {
   const initializedRef = useRef(false);
   const [theme, setTheme] = useState(readStoredTheme);
   const [headerMount, setHeaderMount] = useState(null);
   const [navMount, setNavMount] = useState(null);
-
-  useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
 
   useLayoutEffect(() => {
     setHeaderMount(document.getElementById('themeToggleMount'));

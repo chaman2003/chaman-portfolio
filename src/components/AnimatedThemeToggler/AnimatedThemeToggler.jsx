@@ -146,10 +146,18 @@ function SunIcon() {
   );
 }
 
+function applyThemeToDocument(nextTheme) {
+  if (nextTheme === 'light') {
+    document.body.setAttribute('data-theme', 'light');
+  } else {
+    document.body.removeAttribute('data-theme');
+  }
+}
+
 export function AnimatedThemeToggler({
   className,
   duration = 800,
-  delay = 200,
+  delay = 0,
   variant = 'circle',
   fromCenter = false,
   theme,
@@ -161,6 +169,7 @@ export function AnimatedThemeToggler({
   const [internalIsDark, setInternalIsDark] = useState(true);
   const isDark = isControlled ? theme === 'dark' : internalIsDark;
   const buttonRef = useRef(null);
+  const isTransitioningRef = useRef(false);
 
   useEffect(() => {
     if (isControlled) return undefined;
@@ -182,7 +191,19 @@ export function AnimatedThemeToggler({
 
   const toggleTheme = useCallback(() => {
     const button = buttonRef.current;
-    if (!button) return;
+    if (!button || isTransitioningRef.current) return;
+
+    const nextTheme = isDark ? 'light' : 'dark';
+
+    const finishToggle = () => {
+      isTransitioningRef.current = false;
+      if (isControlled) {
+        onThemeChange?.(nextTheme);
+      } else {
+        setInternalIsDark(nextTheme === 'dark');
+        localStorage.setItem('theme', nextTheme);
+      }
+    };
 
     const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
     const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
@@ -203,26 +224,13 @@ export function AnimatedThemeToggler({
       Math.max(y, viewportHeight - y)
     );
 
-    const applyTheme = () => {
-      const newIsDark = !isDark;
-      const nextTheme = newIsDark ? 'dark' : 'light';
-      if (nextTheme === 'light') {
-        document.body.setAttribute('data-theme', 'light');
-      } else {
-        document.body.removeAttribute('data-theme');
-      }
-      if (isControlled) {
-        onThemeChange?.(nextTheme);
-      } else {
-        setInternalIsDark(newIsDark);
-        localStorage.setItem('theme', nextTheme);
-      }
-    };
-
     if (typeof document.startViewTransition !== 'function') {
-      applyTheme();
+      applyThemeToDocument(nextTheme);
+      finishToggle();
       return;
     }
+
+    isTransitioningRef.current = true;
 
     const clipPath = getThemeTransitionClipPaths(
       shape,
@@ -236,40 +244,50 @@ export function AnimatedThemeToggler({
     const root = document.documentElement;
     root.dataset.magicuiThemeVt = 'active';
     root.style.setProperty('--magicui-theme-toggle-vt-duration', `${duration}ms`);
-    root.style.setProperty('--magicui-theme-toggle-vt-delay', `${delay}ms`);
     root.style.setProperty('--magicui-theme-vt-clip-from', clipPath[0]);
 
     const cleanup = () => {
       delete root.dataset.magicuiThemeVt;
       root.style.removeProperty('--magicui-theme-toggle-vt-duration');
-      root.style.removeProperty('--magicui-theme-toggle-vt-delay');
       root.style.removeProperty('--magicui-theme-vt-clip-from');
     };
 
     const transition = document.startViewTransition(() => {
-      flushSync(applyTheme);
+      flushSync(() => {
+        applyThemeToDocument(nextTheme);
+      });
     });
 
-    if (typeof transition?.finished?.finally === 'function') {
-      transition.finished.finally(cleanup);
-    } else {
-      cleanup();
+    const runClipAnimation = () => {
+      document.documentElement.animate(
+        { clipPath },
+        {
+          duration,
+          delay,
+          easing: shape === 'star' ? 'linear' : 'ease-in-out',
+          fill: 'forwards',
+          pseudoElement: '::view-transition-new(root)',
+        }
+      );
+    };
+
+    if (transition?.ready && typeof transition.ready.then === 'function') {
+      transition.ready.then(runClipAnimation);
     }
 
-    const ready = transition?.ready;
-    if (ready && typeof ready.then === 'function') {
-      ready.then(() => {
-        document.documentElement.animate(
-          { clipPath },
-          {
-            duration,
-            delay,
-            easing: shape === 'star' ? 'linear' : 'ease-in-out',
-            fill: 'forwards',
-            pseudoElement: '::view-transition-new(root)',
-          }
-        );
-      });
+    if (transition?.finished && typeof transition.finished.then === 'function') {
+      transition.finished
+        .then(() => {
+          cleanup();
+          finishToggle();
+        })
+        .catch(() => {
+          cleanup();
+          finishToggle();
+        });
+    } else {
+      cleanup();
+      finishToggle();
     }
   }, [shape, fromCenter, duration, delay, isDark, isControlled, onThemeChange]);
 
