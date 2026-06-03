@@ -7,7 +7,6 @@ const ghCardsEl = document.getElementById('githubCards');
 const ghHeadlineEl = document.getElementById('ghHeadline');
 const scrollProgressEl = document.getElementById('scrollProgress');
 const heroSceneEl = document.getElementById('heroScene');
-const themeToggleBtn = document.getElementById('themeToggle');
 const logoMarqueeEl = document.getElementById('logoMarquee');
 const backToTopBtn = document.getElementById('backToTop');
 const labOutputEl = document.getElementById('labOutput');
@@ -178,23 +177,6 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 const preloaderDone = () => document.body.classList.add('loaded');
 window.addEventListener('load', () => setTimeout(preloaderDone, 420));
 setTimeout(preloaderDone, 1800);
-
-// Theme toggle
-const storedTheme = localStorage.getItem('theme');
-if (storedTheme === 'light') {
-  document.body.setAttribute('data-theme', 'light');
-  if (themeToggleBtn) themeToggleBtn.textContent = '☀️ Light';
-}
-
-function toggleTheme() {
-  const current = document.body.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.body.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  if (themeToggleBtn) themeToggleBtn.textContent = next === 'dark' ? '🌙 Dark' : '☀️ Light';
-}
-
-themeToggleBtn?.addEventListener('click', toggleTheme);
 
 function isDrawerViewport() {
   return window.innerWidth <= 1023;
@@ -680,10 +662,10 @@ function truncateText(text = '', maxLength = 190) {
 
 function getGithubCols() {
   const w = window.innerWidth;
+  if (w < 768) return 1;
   if (w >= 1680) return 4;
   if (w >= 1180) return 3;
-  if (w >= 760) return 2;
-  if (w >= 640) return 2;
+  if (w >= 768) return 2;
   return 1;
 }
 

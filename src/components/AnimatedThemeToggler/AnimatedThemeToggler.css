@@ -1,0 +1,15 @@
+.animated-theme-toggler {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.45rem;
+  border-radius: 12px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.animated-theme-toggler svg {
+  display: block;
+}
