@@ -30,7 +30,7 @@ export function setupInfiniteMarquee(trackEl) {
   });
 }
 
-import { isMobilePerfMode } from '../../lib/performance.js';
+import { isPerfLite } from '../../lib/performance.js';
 
 export function initMarquee(ctx) {
   const { tickerTrack, logoMarquee } = ctx.dom;
@@ -40,7 +40,7 @@ export function initMarquee(ctx) {
 
   const syncMarqueePlayState = () => {
     const playState =
-      document.hidden || !ctx.isMotionEnabled() || isMobilePerfMode() ? 'paused' : 'running';
+      document.hidden || !ctx.isMotionEnabled() || isPerfLite() ? 'paused' : 'running';
     if (tickerTrack) tickerTrack.style.animationPlayState = playState;
     if (logoMarquee) logoMarquee.style.animationPlayState = playState;
   };

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { isMobilePerfMode } from '../../lib/performance.js';
+import { isGpuPerfLite } from '../../lib/performance.js';
 import { cn } from '../../lib/utils.js';
 import './AnimatedThemeToggler.css';
 
@@ -209,7 +209,7 @@ export function AnimatedThemeToggler({
 
     const maxRadius = Math.hypot(Math.max(x, viewportWidth - x), Math.max(y, viewportHeight - y));
 
-    if (typeof document.startViewTransition !== 'function' || isMobilePerfMode()) {
+    if (typeof document.startViewTransition !== 'function' || isGpuPerfLite()) {
       applyThemeToDocument(nextTheme);
       finishToggle();
       return;

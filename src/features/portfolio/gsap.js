@@ -1,4 +1,4 @@
-import { isMobilePerfMode } from '../../lib/performance.js';
+import { isPerfLite } from '../../lib/performance.js';
 
 export function initGsap(ctx) {
   const initGsapAnimations = () => {
@@ -8,7 +8,7 @@ export function initGsap(ctx) {
       !window.gsap ||
       !window.ScrollTrigger ||
       !ctx.isMotionEnabled() ||
-      isMobilePerfMode()
+      isPerfLite()
     ) {
       return;
     }

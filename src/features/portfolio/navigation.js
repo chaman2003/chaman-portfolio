@@ -43,8 +43,26 @@ export function initNavigation(ctx) {
     if (event.key === 'Escape') closeNav();
   });
 
-  window.addEventListener('resize', syncNavForViewport);
+  const syncMobileHeaderOffset = () => {
+    if (!isDrawerViewport()) {
+      document.documentElement.style.removeProperty('--mobile-header-offset');
+      return;
+    }
+
+    const header = document.querySelector('.header');
+    if (!header) return;
+
+    const offset = Math.ceil(header.getBoundingClientRect().height + 14);
+    document.documentElement.style.setProperty('--mobile-header-offset', `${offset}px`);
+  };
+
+  window.addEventListener('resize', () => {
+    syncNavForViewport();
+    syncMobileHeaderOffset();
+  });
   syncNavForViewport();
+  syncMobileHeaderOffset();
+  requestAnimationFrame(syncMobileHeaderOffset);
 
   const navLinks = Array.from(document.querySelectorAll('nav a[href^="#"]'));
   const sectionMap = navLinks

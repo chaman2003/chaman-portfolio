@@ -1,5 +1,5 @@
 import { TYPEWRITER_LINES } from '../../config/lab-commands.js';
-import { isMobilePerfMode, isPerfLite } from '../../lib/performance.js';
+import { isPerfLite } from '../../lib/performance.js';
 
 export function initHeroInteractions(ctx) {
   const { typewriter, heroScene } = ctx.dom;
@@ -10,7 +10,7 @@ export function initHeroInteractions(ctx) {
 
   const runTypewriter = () => {
     if (!typewriter) return;
-    if (!ctx.isMotionEnabled() || isPerfLite() || isMobilePerfMode()) {
+    if (!ctx.isMotionEnabled() || isPerfLite()) {
       typewriter.textContent = TYPEWRITER_LINES[0];
       return;
     }
@@ -50,7 +50,7 @@ export function initHeroInteractions(ctx) {
   clearHeroSceneTransform();
   window.addEventListener('resize', clearHeroSceneTransform, { passive: true });
 
-  if (isPerfLite() || isMobilePerfMode()) return;
+  if (isPerfLite()) return;
 
   const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
   if (!hasFinePointer) return;

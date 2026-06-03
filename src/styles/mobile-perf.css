@@ -1,56 +1,98 @@
-/* Touch devices: disable expensive paints and infinite animations */
-html.mobile-perf body::before,
-html.mobile-perf .aurora,
+/* Touch: trim GPU-heavy layers but keep motion-friendly CSS animations */
+html.mobile-touch body::before,
+html.mobile-touch .aurora {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+html.mobile-touch #starfield {
+  opacity: 0.28;
+}
+
+html.mobile-touch .glass:not(.header),
+html.mobile-touch .glass-sub {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.mobile-touch .noise {
+  display: none;
+}
+
+html.mobile-touch #scrollProgress {
+  box-shadow: none;
+  will-change: auto;
+}
+
+/* Fixed, opaque header on phones — always visible while scrolling */
+@media (max-width: 1023px) {
+  .header {
+    position: fixed;
+    top: max(6px, env(safe-area-inset-top, 0px));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(var(--container-max), calc(100% - (var(--container-padding) * 2)));
+    max-width: calc(100vw - (var(--container-padding) * 2));
+    z-index: 110;
+    margin: 0;
+    background: rgba(9, 24, 52, 0.96) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(124, 168, 255, 0.38);
+    box-shadow: 0 10px 32px rgba(2, 9, 23, 0.48);
+  }
+
+  body[data-theme='light'] .header {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: rgba(31, 109, 224, 0.28);
+    box-shadow: 0 10px 28px rgba(19, 49, 102, 0.14);
+  }
+
+  main {
+    padding-top: var(--mobile-header-offset, 5.25rem);
+  }
+
+  body.nav-open nav#siteNav {
+    z-index: 120;
+  }
+
+  .nav-backdrop {
+    z-index: 115;
+  }
+}
+
+/* Default: pause heavy loops on touch until motion is enabled */
+html.mobile-touch .ticker-track,
+html.mobile-touch .logo-marquee,
+html.mobile-touch .logo-pill {
+  animation-play-state: paused;
+}
+
+/* Lightweight motion ON — restore CSS animations (no starfield RAF / blur) */
+html.mobile-touch body[data-motion='on'] .ticker-track,
+html.mobile-touch body[data-motion='on'] .logo-marquee,
+html.mobile-touch body[data-motion='on'] .logo-pill,
+html.mobile-touch body[data-motion='on'] .floating-tags span,
+html.mobile-touch body[data-motion='on'] .scroll-cue,
+html.mobile-touch body[data-motion='on'] .btn-primary,
+html.mobile-touch body[data-motion='on'] .brand::after,
+html.mobile-touch body[data-motion='on'] .preloader-core {
+  animation-play-state: running !important;
+}
+
 body[data-perf-lite]::before,
 body[data-perf-lite] .aurora {
   animation: none !important;
   opacity: 0 !important;
 }
 
-html.mobile-perf #starfield,
 body[data-perf-lite] #starfield {
   display: none !important;
 }
 
-html.mobile-perf .glass,
-html.mobile-perf .glass-sub,
 body[data-perf-lite] .glass:not(.header),
 body[data-perf-lite] .glass-sub {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-}
-
-html.mobile-perf .header,
-body[data-perf-lite] .header {
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-}
-
-html.mobile-perf nav#siteNav,
-body[data-perf-lite] nav#siteNav {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-html.mobile-perf .ticker-track,
-html.mobile-perf .logo-marquee,
-html.mobile-perf .logo-pill,
-html.mobile-perf .floating-tags span,
-html.mobile-perf .scroll-cue,
-html.mobile-perf .btn-primary {
-  animation-play-state: paused !important;
-}
-
-html.mobile-perf .noise {
-  display: none;
-}
-
-html.mobile-perf #scrollProgress {
-  box-shadow: none;
-  will-change: auto;
-}
-
-html.mobile-perf .fetch-terminal,
-html.mobile-perf .panel {
-  box-shadow: none;
 }

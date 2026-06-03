@@ -1,13 +1,12 @@
-import { isMobilePerfMode, shouldRunStarfieldAnimation } from '../../lib/performance.js';
+import { isGpuPerfLite, shouldRunStarfieldAnimation } from '../../lib/performance.js';
 
 export function initStarfield(ctx) {
   const canvas = ctx.dom.starfield;
   const context2d = canvas?.getContext('2d', { alpha: true, desynchronized: true });
   if (!canvas || !context2d) return;
 
-  if (isMobilePerfMode()) {
-    canvas.style.display = 'none';
-    return;
+  if (isGpuPerfLite()) {
+    canvas.style.opacity = '0.28';
   }
 
   const stars = [];
