@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { isGpuPerfLite } from '../../lib/performance.js';
+import { shouldUseThemeViewTransition } from '../../lib/performance.js';
 import { cn } from '../../lib/utils.js';
 import './AnimatedThemeToggler.css';
 
@@ -209,7 +209,7 @@ export function AnimatedThemeToggler({
 
     const maxRadius = Math.hypot(Math.max(x, viewportWidth - x), Math.max(y, viewportHeight - y));
 
-    if (typeof document.startViewTransition !== 'function' || isGpuPerfLite()) {
+    if (!shouldUseThemeViewTransition()) {
       applyThemeToDocument(nextTheme);
       finishToggle();
       return;
@@ -239,6 +239,14 @@ export function AnimatedThemeToggler({
       root.style.removeProperty('--magicui-theme-vt-clip-from');
     };
 
+    let completed = false;
+    const complete = () => {
+      if (completed) return;
+      completed = true;
+      cleanup();
+      finishToggle();
+    };
+
     const transition = document.startViewTransition(() => {
       flushSync(() => {
         applyThemeToDocument(nextTheme);
@@ -259,22 +267,15 @@ export function AnimatedThemeToggler({
     };
 
     if (transition?.ready && typeof transition.ready.then === 'function') {
-      transition.ready.then(runClipAnimation);
+      transition.ready.then(runClipAnimation).catch(complete);
+    } else {
+      runClipAnimation();
     }
 
     if (transition?.finished && typeof transition.finished.then === 'function') {
-      transition.finished
-        .then(() => {
-          cleanup();
-          finishToggle();
-        })
-        .catch(() => {
-          cleanup();
-          finishToggle();
-        });
+      transition.finished.then(complete).catch(complete);
     } else {
-      cleanup();
-      finishToggle();
+      window.setTimeout(complete, duration + delay + 50);
     }
   }, [shape, fromCenter, duration, delay, isDark, isControlled, onThemeChange]);
 

@@ -75,3 +75,10 @@ export function shouldUseSpringScrollProgress() {
   if (isGpuPerfLite()) return false;
   return true;
 }
+
+/** View Transition API theme reveal — allowed on phones; skip only true perf-lite cases. */
+export function shouldUseThemeViewTransition() {
+  if (typeof window === 'undefined') return false;
+  if (typeof document.startViewTransition !== 'function') return false;
+  return !isPerfLite();
+}
