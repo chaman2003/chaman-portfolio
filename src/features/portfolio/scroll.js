@@ -1,7 +1,10 @@
 import { motionValue } from 'motion';
 import { attachFollow } from 'motion-dom';
 import { createMotionSmoothScroll } from '../../lib/motion-smooth-scroll.js';
-import { shouldEnableMotionSmoothScroll } from '../../lib/performance.js';
+import {
+  shouldEnableMotionSmoothScroll,
+  shouldUseSpringScrollProgress,
+} from '../../lib/performance.js';
 import { bindScrollChains } from '../../lib/scroll-chain.js';
 import { hardScrollToTop, scheduleScrollToTop } from '../../lib/scroll-reset.js';
 
@@ -31,6 +34,7 @@ export function initScroll(ctx) {
 
   const { scrollProgress, backToTop } = ctx.dom;
   const scrollApi = { engine: null, scrollTo: null, destroy: () => {} };
+  const useSpringProgress = shouldUseSpringScrollProgress();
 
   hardScrollToTop();
   document.body.classList.remove('nav-open');
@@ -39,13 +43,15 @@ export function initScroll(ctx) {
 
   const rawProgress = motionValue(0);
   const smoothProgress = motionValue(0);
-  const stopProgressFollow = attachFollow(smoothProgress, rawProgress, PROGRESS_SPRING);
+  const stopProgressFollow = useSpringProgress
+    ? attachFollow(smoothProgress, rawProgress, PROGRESS_SPRING)
+    : () => {};
 
   let lastProgressScale = -1;
   let lastBackToTopVisible = null;
   let stopProgressListener = () => {};
 
-  if (scrollProgress) {
+  if (scrollProgress && useSpringProgress) {
     stopProgressListener = smoothProgress.on('change', (scale) => {
       const clamped = Math.min(1, Math.max(0, scale));
       if (Math.abs(clamped - lastProgressScale) > 0.001) {
@@ -62,7 +68,14 @@ export function initScroll(ctx) {
       document.documentElement.scrollHeight - document.documentElement.clientHeight
     );
     const ratio = limit > 0 ? scrollTop / limit : 0;
-    rawProgress.set(Math.min(1, Math.max(0, ratio)));
+    const clamped = Math.min(1, Math.max(0, ratio));
+
+    if (useSpringProgress) {
+      rawProgress.set(clamped);
+    } else if (scrollProgress && Math.abs(clamped - lastProgressScale) > 0.001) {
+      lastProgressScale = clamped;
+      scrollProgress.style.transform = `scaleX(${clamped})`;
+    }
 
     if (backToTop) {
       const showTop = scrollTop > 260;
@@ -105,7 +118,10 @@ export function initScroll(ctx) {
   const useMotionScroll = shouldEnableMotionSmoothScroll();
 
   markNestedScrollAreas();
-  bindScrollChains(['#labOutput', '.nav-drawer-links', '.fetch-body']);
+
+  if (!useSpringProgress) {
+    bindScrollChains(['#labOutput', '.nav-drawer-links']);
+  }
 
   if (useMotionScroll) {
     const engine = createMotionSmoothScroll();

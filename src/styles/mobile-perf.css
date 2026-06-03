@@ -1,0 +1,56 @@
+/* Touch devices: disable expensive paints and infinite animations */
+html.mobile-perf body::before,
+html.mobile-perf .aurora,
+body[data-perf-lite]::before,
+body[data-perf-lite] .aurora {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+html.mobile-perf #starfield,
+body[data-perf-lite] #starfield {
+  display: none !important;
+}
+
+html.mobile-perf .glass,
+html.mobile-perf .glass-sub,
+body[data-perf-lite] .glass:not(.header),
+body[data-perf-lite] .glass-sub {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.mobile-perf .header,
+body[data-perf-lite] .header {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+html.mobile-perf nav#siteNav,
+body[data-perf-lite] nav#siteNav {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.mobile-perf .ticker-track,
+html.mobile-perf .logo-marquee,
+html.mobile-perf .logo-pill,
+html.mobile-perf .floating-tags span,
+html.mobile-perf .scroll-cue,
+html.mobile-perf .btn-primary {
+  animation-play-state: paused !important;
+}
+
+html.mobile-perf .noise {
+  display: none;
+}
+
+html.mobile-perf #scrollProgress {
+  box-shadow: none;
+  will-change: auto;
+}
+
+html.mobile-perf .fetch-terminal,
+html.mobile-perf .panel {
+  box-shadow: none;
+}

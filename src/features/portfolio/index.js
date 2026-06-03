@@ -1,3 +1,4 @@
+import { applyMobilePerfDocumentFlags } from '../../lib/performance.js';
 import { createPortfolioContext } from './context.js';
 import { initMotion } from './motion.js';
 import { initPreloader } from './preloader.js';
@@ -12,6 +13,7 @@ import { initStarfield } from './starfield.js';
 
 /** Wire all DOM-driven portfolio interactions after the HTML shell mounts. */
 export function initPortfolioEffects() {
+  applyMobilePerfDocumentFlags();
   const ctx = createPortfolioContext();
 
   initMotion(ctx);

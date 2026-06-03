@@ -1,9 +1,14 @@
-import { shouldRunStarfieldAnimation } from '../../lib/performance.js';
+import { isMobilePerfMode, shouldRunStarfieldAnimation } from '../../lib/performance.js';
 
 export function initStarfield(ctx) {
   const canvas = ctx.dom.starfield;
   const context2d = canvas?.getContext('2d', { alpha: true, desynchronized: true });
   if (!canvas || !context2d) return;
+
+  if (isMobilePerfMode()) {
+    canvas.style.display = 'none';
+    return;
+  }
 
   const stars = [];
   let starCount = Math.min(ctx.motion.profile?.starCount || 40, 36);

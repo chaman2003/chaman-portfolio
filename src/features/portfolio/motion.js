@@ -1,4 +1,4 @@
-import { isPerfLite } from '../../lib/performance.js';
+import { applyMobilePerfDocumentFlags, isPerfLite } from '../../lib/performance.js';
 
 function getViewportTier(width = window.innerWidth) {
   if (width < 320) return 'watch';
@@ -92,6 +92,8 @@ function buildMotionProfile(ctx) {
 
 export function initMotion(ctx) {
   const { motion } = ctx;
+
+  applyMobilePerfDocumentFlags();
 
   if (isPerfLite()) {
     document.body.setAttribute('data-perf-lite', 'true');
