@@ -637,7 +637,7 @@ h1 span {
   grid-template-rows: auto auto auto;
   border: 1px solid var(--border);
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   background: #050b18;
   box-shadow: inset 0 0 0 1px rgba(128, 170, 255, 0.15);
 }
@@ -696,23 +696,8 @@ body[data-theme='light'] .fetch-terminal {
   gap: 0.36rem;
   align-items: start;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(124, 168, 255, 0.45) transparent;
-}
-
-.fetch-body::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-
-.fetch-body::-webkit-scrollbar-thumb {
-  background: rgba(124, 168, 255, 0.45);
-  border-radius: 999px;
+  overflow: visible;
+  overscroll-behavior: auto;
 }
 
 .fetch-logo,
@@ -1235,22 +1220,7 @@ body[data-theme='light'] .exp-card-featured {
   font-weight: 700;
   font-size: 0.98rem;
   color: var(--text);
-  line-height: 1.35;
-}
-
-.edu-fullform {
-  margin: 0.12rem 0 0;
-  font-size: 0.78rem;
-  color: var(--muted);
-  line-height: 1.35;
-}
-
-.edu-major {
-  margin: 0.42rem 0 0;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text);
-  line-height: 1.35;
+  line-height: 1.45;
 }
 
 .edu-honours {
@@ -1737,7 +1707,7 @@ body[data-theme='light'] .lab-console {
   min-height: clamp(150px, 24vh, 210px);
   max-height: clamp(180px, 28vh, 260px);
   overflow: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   scrollbar-width: thin;
@@ -2539,25 +2509,32 @@ main > section {
   }
 
   .fetch-body {
-    grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
-    max-height: min(56vh, 460px);
-    overflow-x: hidden;
-    gap: 0.3rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    max-height: none;
+    overflow: visible;
+    gap: 0.35rem;
   }
 
   .fetch-logo {
     display: block;
-    font-size: clamp(0.42rem, 1.35vw, 0.52rem);
-    line-height: 1.12;
+    order: 1;
+    font-size: clamp(0.48rem, 1.6vw, 0.58rem);
+    line-height: 1.1;
     color: #7db2ff;
     overflow: hidden;
-    max-height: 100%;
+    max-height: 5.25rem;
+    margin: 0;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(124, 168, 255, 0.22);
     align-self: stretch;
   }
 
   .fetch-info {
+    order: 2;
     overflow: visible;
     max-height: none;
+    white-space: pre-wrap;
   }
 
   .lab-grid {
@@ -2649,7 +2626,8 @@ main > section {
   .fetch-body {
     grid-template-columns: 1fr;
     gap: 0.2rem;
-    max-height: min(48vh, 360px);
+    max-height: none;
+    overflow: visible;
   }
 
   .fetch-info {
@@ -2731,12 +2709,14 @@ main > section {
   }
 
   .fetch-body {
-    grid-template-columns: minmax(0, 0.38fr) minmax(0, 1fr);
-    max-height: min(50vh, 400px);
+    grid-template-columns: 1fr;
+    max-height: none;
+    overflow: visible;
   }
 
   .fetch-logo {
-    font-size: clamp(0.38rem, 1.2vw, 0.48rem);
+    max-height: 4.75rem;
+    font-size: clamp(0.44rem, 1.4vw, 0.52rem);
   }
 
   .nav-close,
@@ -2860,11 +2840,6 @@ main > section {
 
   .fetch-body {
     padding: 0.36rem;
-  }
-
-  .fetch-body {
-    grid-template-columns: 1fr;
-    max-height: min(48vh, 380px);
   }
 
   .fetch-logo {

@@ -2,6 +2,7 @@ import { motionValue } from 'motion';
 import { attachFollow } from 'motion-dom';
 import { createMotionSmoothScroll } from '../../lib/motion-smooth-scroll.js';
 import { shouldEnableMotionSmoothScroll } from '../../lib/performance.js';
+import { bindScrollChains } from '../../lib/scroll-chain.js';
 import { hardScrollToTop, scheduleScrollToTop } from '../../lib/scroll-reset.js';
 
 let activeScrollTeardown = null;
@@ -13,50 +14,13 @@ const PROGRESS_SPRING = {
   restDelta: 0.001,
 };
 
+/** Only true inner panels (lab, mobile nav) — not the hero terminal. */
 function markNestedScrollAreas() {
   document
-    .querySelectorAll('[data-nested-scroll], [data-lenis-prevent], .fetch-body, #labOutput, .nav-drawer-links')
+    .querySelectorAll('[data-nested-scroll], #labOutput, .nav-drawer-links')
     .forEach((el) => {
       el.setAttribute('data-nested-scroll', '');
     });
-}
-
-/** Let wheel/touch scroll stay inside terminal panels instead of moving the page. */
-function bindNestedScrollGuards() {
-  const nestedScrollers = document.querySelectorAll('[data-nested-scroll]');
-
-  nestedScrollers.forEach((el) => {
-    if (el.dataset.nestedScrollBound === '1') return;
-    el.dataset.nestedScrollBound = '1';
-
-    el.addEventListener(
-      'wheel',
-      (event) => {
-        if (el.scrollHeight <= el.clientHeight) return;
-        event.stopPropagation();
-      },
-      { passive: true }
-    );
-
-    el.addEventListener(
-      'touchmove',
-      (event) => {
-        if (el.scrollHeight <= el.clientHeight) return;
-        event.stopPropagation();
-      },
-      { passive: true }
-    );
-  });
-}
-
-function getScrollMetrics(engine) {
-  if (engine) {
-    return { scroll: engine.scroll, limit: engine.limit };
-  }
-
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-  const limit = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  return { scroll: scrollTop, limit };
 }
 
 export function initScroll(ctx) {
@@ -92,12 +56,16 @@ export function initScroll(ctx) {
   }
 
   const updateScrollProgress = () => {
-    const { scroll, limit } = getScrollMetrics(scrollApi.engine);
-    const ratio = limit > 0 ? scroll / limit : 0;
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const limit = Math.max(
+      0,
+      document.documentElement.scrollHeight - document.documentElement.clientHeight
+    );
+    const ratio = limit > 0 ? scrollTop / limit : 0;
     rawProgress.set(Math.min(1, Math.max(0, ratio)));
 
     if (backToTop) {
-      const showTop = scroll > 260;
+      const showTop = scrollTop > 260;
       if (showTop !== lastBackToTopVisible) {
         lastBackToTopVisible = showTop;
         backToTop.classList.toggle('visible', showTop);
@@ -121,7 +89,7 @@ export function initScroll(ctx) {
   scrollApi.scrollTo = scrollToTarget;
 
   let scrollTicking = false;
-  const onScrollProgress = () => {
+  const onScroll = () => {
     if (scrollTicking) return;
     scrollTicking = true;
     requestAnimationFrame(() => {
@@ -135,59 +103,25 @@ export function initScroll(ctx) {
   });
 
   const useMotionScroll = shouldEnableMotionSmoothScroll();
-  const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 
   markNestedScrollAreas();
-  bindNestedScrollGuards();
+  bindScrollChains(['#labOutput', '.nav-drawer-links', '.fetch-body']);
 
   if (useMotionScroll) {
-    const engine = createMotionSmoothScroll({
-      wheelMultiplier: isCoarsePointer ? 0.85 : 0.72,
-      touchMultiplier: isCoarsePointer ? 0.92 : 1.05,
-    });
-
-    engine.bind({
-      smoothWheel: !isCoarsePointer,
-      smoothTouch: false,
-    });
-
+    const engine = createMotionSmoothScroll();
+    engine.bind();
     scrollApi.engine = engine;
     window.__portfolioMotionScroll = engine;
-
-    let progressRaf = 0;
-    const trackProgress = () => {
-      onScrollProgress();
-      progressRaf = requestAnimationFrame(trackProgress);
-    };
-    progressRaf = requestAnimationFrame(trackProgress);
-
-    if (window.gsap?.ticker && window.ScrollTrigger) {
-      window.gsap.registerPlugin(window.ScrollTrigger);
-      window.gsap.ticker.add(onScrollProgress);
-      window.gsap.ticker.lagSmoothing(0);
-    }
-
-    scrollApi.destroy = () => {
-      cancelAnimationFrame(progressRaf);
-      engine.destroy();
-      document.documentElement.classList.remove('motion-smooth-scroll');
-      scrollApi.engine = null;
-      if (window.__portfolioMotionScroll === engine) {
-        window.__portfolioMotionScroll = null;
-      }
-      if (window.gsap?.ticker) {
-        window.gsap.ticker.remove(onScrollProgress);
-      }
-    };
 
     hardScrollToTop(engine);
     engine.resize();
     scheduleScrollToTop(engine);
   } else {
     scheduleScrollToTop();
-    window.addEventListener('scroll', onScrollProgress, { passive: true });
-    updateScrollProgress();
   }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  updateScrollProgress();
 
   const onPageShow = () => {
     hardScrollToTop(scrollApi.engine);
@@ -198,10 +132,6 @@ export function initScroll(ctx) {
   };
 
   window.addEventListener('pageshow', onPageShow);
-
-  if (!useMotionScroll) {
-    updateScrollProgress();
-  }
 
   backToTop?.addEventListener('click', () => {
     scrollToTarget(0, { offset: 0 });
@@ -252,15 +182,17 @@ export function initScroll(ctx) {
   );
   counters.forEach((counter) => counterObserver.observe(counter));
 
-  const baseDestroy = scrollApi.destroy;
   scrollApi.destroy = () => {
     window.removeEventListener('pageshow', onPageShow);
+    window.removeEventListener('scroll', onScroll);
     stopProgressFollow();
     stopProgressListener();
-    if (!useMotionScroll) {
-      window.removeEventListener('scroll', onScrollProgress);
+    scrollApi.engine?.destroy();
+    document.documentElement.classList.remove('motion-smooth-scroll');
+    scrollApi.engine = null;
+    if (window.__portfolioMotionScroll) {
+      window.__portfolioMotionScroll = null;
     }
-    baseDestroy();
   };
 
   activeScrollTeardown = scrollApi.destroy;

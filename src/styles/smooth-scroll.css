@@ -6,11 +6,16 @@ html.motion-smooth-scroll body {
   scroll-behavior: auto !important;
 }
 
-[data-nested-scroll],
-[data-lenis-prevent] {
-  overscroll-behavior: contain;
+[data-nested-scroll] {
+  overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
+}
+
+/* Hero terminal: never trap page scroll when hovering it */
+.fetch-body {
+  overscroll-behavior: auto;
+  touch-action: auto;
 }
 
 html.motion-smooth-scroll #starfield,

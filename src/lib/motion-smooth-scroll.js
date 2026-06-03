@@ -1,18 +1,10 @@
-import { animate, motionValue } from 'motion';
-import { attachFollow } from 'motion-dom';
-
-const DEFAULT_SPRING = {
-  type: 'spring',
-  stiffness: 120,
-  damping: 28,
-  mass: 0.85,
-};
+import { animate } from 'motion';
 
 const ANCHOR_SPRING = {
   type: 'spring',
-  stiffness: 72,
-  damping: 22,
-  mass: 1.05,
+  stiffness: 90,
+  damping: 24,
+  mass: 0.95,
 };
 
 function getScrollLimit() {
@@ -38,70 +30,12 @@ function resolveScrollY(target, offset = 0) {
 }
 
 /**
- * Motion spring–driven smooth scroll (replaces Lenis).
- * Wheel deltas update a target value; attachFollow springs the page position toward it.
+ * Motion spring scroll for programmatic navigation only (anchors, back-to-top).
+ * Page wheel/touch scrolling stays native so nested panels and mobile work reliably.
  */
-export function createMotionSmoothScroll(options = {}) {
-  const wheelMultiplier = options.wheelMultiplier ?? 0.72;
-  const touchMultiplier = options.touchMultiplier ?? 0.92;
-  const wheelSpring = { ...DEFAULT_SPRING, ...options.wheelSpring };
-
-  const targetY = motionValue(window.scrollY);
-  const smoothY = motionValue(window.scrollY);
-
+export function createMotionSmoothScroll() {
   let anchorAnimation = null;
-  let touchStartY = 0;
-  let lastTouchY = 0;
   let enabled = true;
-
-  const stopFollow = attachFollow(smoothY, targetY, wheelSpring);
-
-  const applyScroll = (y) => {
-    const clamped = clampScroll(y);
-    if (Math.abs(window.scrollY - clamped) > 0.5) {
-      window.scrollTo(0, clamped);
-    }
-    return clamped;
-  };
-
-  const unsubSmooth = smoothY.on('change', (latest) => {
-    applyScroll(latest);
-  });
-
-  const syncFromNativeScroll = () => {
-    const y = window.scrollY;
-    targetY.jump(y);
-    smoothY.jump(y);
-  };
-
-  const shouldIgnoreEvent = (event) =>
-    Boolean(event.target?.closest?.('[data-nested-scroll], [data-lenis-prevent]'));
-
-  const onWheel = (event) => {
-    if (!enabled || shouldIgnoreEvent(event)) return;
-
-    event.preventDefault();
-    targetY.set(clampScroll(targetY.get() + event.deltaY * wheelMultiplier));
-  };
-
-  const onTouchStart = (event) => {
-    if (!enabled || shouldIgnoreEvent(event)) return;
-    touchStartY = event.touches[0]?.clientY ?? 0;
-    lastTouchY = touchStartY;
-  };
-
-  const onTouchMove = (event) => {
-    if (!enabled || shouldIgnoreEvent(event)) return;
-
-    const y = event.touches[0]?.clientY ?? lastTouchY;
-    const delta = lastTouchY - y;
-    lastTouchY = y;
-
-    if (Math.abs(delta) < 0.5) return;
-
-    event.preventDefault();
-    targetY.set(clampScroll(targetY.get() + delta * touchMultiplier));
-  };
 
   const scrollTo = (target, opts = {}) => {
     const { offset = 0, immediate = false } = opts;
@@ -111,14 +45,18 @@ export function createMotionSmoothScroll(options = {}) {
     anchorAnimation?.stop();
 
     if (immediate) {
-      targetY.jump(y);
-      smoothY.jump(y);
-      applyScroll(y);
+      window.scrollTo(0, y);
       return;
     }
 
-    anchorAnimation = animate(targetY, y, {
+    const start = window.scrollY;
+    if (Math.abs(start - y) < 2) return;
+
+    anchorAnimation = animate(start, y, {
       ...ANCHOR_SPRING,
+      onUpdate: (latest) => {
+        window.scrollTo(0, latest);
+      },
       onComplete: () => {
         anchorAnimation = null;
       },
@@ -129,32 +67,13 @@ export function createMotionSmoothScroll(options = {}) {
     enabled = false;
     anchorAnimation?.stop();
     anchorAnimation = null;
-    stopFollow();
-    unsubSmooth();
-    window.removeEventListener('wheel', onWheel);
-    window.removeEventListener('touchstart', onTouchStart);
-    window.removeEventListener('touchmove', onTouchMove);
-    window.removeEventListener('scroll', syncFromNativeScroll);
   };
 
-  const bind = ({ smoothWheel = true, smoothTouch = false } = {}) => {
+  const bind = () => {
     document.documentElement.classList.add('motion-smooth-scroll');
-
-    if (smoothWheel) {
-      window.addEventListener('wheel', onWheel, { passive: false });
-    }
-
-    if (smoothTouch) {
-      window.addEventListener('touchstart', onTouchStart, { passive: true });
-      window.addEventListener('touchmove', onTouchMove, { passive: false });
-    } else {
-      window.addEventListener('scroll', syncFromNativeScroll, { passive: true });
-    }
   };
 
-  const resize = () => {
-    targetY.set(clampScroll(targetY.get()));
-  };
+  const resize = () => {};
 
   return {
     scrollTo,
@@ -162,16 +81,14 @@ export function createMotionSmoothScroll(options = {}) {
     bind,
     resize,
     get scroll() {
-      return smoothY.get();
+      return window.scrollY;
     },
     get limit() {
       return getScrollLimit();
     },
     jump(y) {
-      const clamped = clampScroll(y);
-      targetY.jump(clamped);
-      smoothY.jump(clamped);
-      applyScroll(clamped);
+      if (!enabled) return;
+      window.scrollTo(0, clampScroll(y));
     },
   };
 }
