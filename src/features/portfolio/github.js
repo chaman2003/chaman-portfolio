@@ -142,6 +142,8 @@ export function initGithub(ctx, { onResize } = {}) {
         `;
         })
         .join('');
+
+      ctx.refreshScrollReveal?.(githubCards);
     } catch (error) {
       const errorText = String(error?.message || '').toLowerCase();
       const isRateLimited = errorText.includes('rate limit');

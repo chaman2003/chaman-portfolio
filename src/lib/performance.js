@@ -71,9 +71,7 @@ export function shouldEnableLenisScroll() {
 }
 
 export function shouldUseSpringScrollProgress() {
-  if (typeof window === 'undefined') return false;
-  if (isGpuPerfLite()) return false;
-  return true;
+  return false;
 }
 
 /** View Transition API theme reveal — allowed on phones; skip only true perf-lite cases. */

@@ -4,6 +4,7 @@ import { initMotion } from './motion.js';
 import { initPreloader } from './preloader.js';
 import { initNavigation } from './navigation.js';
 import { initScroll } from './scroll.js';
+import { initScrollReveal } from './reveal.js';
 import { initLabTerminal } from './lab-terminal.js';
 import { initGithub } from './github.js';
 import { initHeroInteractions } from './hero-interactions.js';
@@ -36,6 +37,7 @@ export function initPortfolioEffects() {
 
   initLabTerminal(ctx);
   initScroll(ctx);
+  initScrollReveal(ctx);
   initHeroInteractions(ctx);
 
   const { initGsapAnimations } = initGsap(ctx);

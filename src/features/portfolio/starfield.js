@@ -1,5 +1,9 @@
 import { isGpuPerfLite, shouldRunStarfieldAnimation } from '../../lib/performance.js';
 
+function isScrollingNow() {
+  return document.documentElement.classList.contains('is-scrolling');
+}
+
 export function initStarfield(ctx) {
   const canvas = ctx.dom.starfield;
   const context2d = canvas?.getContext('2d', { alpha: true, desynchronized: true });
@@ -63,6 +67,12 @@ export function initStarfield(ctx) {
 
     if (!shouldRunStarfieldAnimation(ctx.isMotionEnabled())) {
       drawStatic();
+      return;
+    }
+
+    if (isScrollingNow()) {
+      drawStatic();
+      rafId = requestAnimationFrame(draw);
       return;
     }
 

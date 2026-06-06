@@ -1,21 +1,10 @@
-import { motionValue } from 'motion';
-import { attachFollow } from 'motion-dom';
 import { createMotionSmoothScroll } from '../../lib/motion-smooth-scroll.js';
-import {
-  shouldEnableMotionSmoothScroll,
-  shouldUseSpringScrollProgress,
-} from '../../lib/performance.js';
 import { bindScrollChains } from '../../lib/scroll-chain.js';
 import { hardScrollToTop, scheduleScrollToTop } from '../../lib/scroll-reset.js';
+import { bindScrollVelocityTracking } from '../../lib/scroll-velocity.js';
+import { shouldEnableMotionSmoothScroll } from '../../lib/performance.js';
 
 let activeScrollTeardown = null;
-
-const PROGRESS_SPRING = {
-  type: 'spring',
-  stiffness: 100,
-  damping: 30,
-  restDelta: 0.001,
-};
 
 /** Only true inner panels (lab, mobile nav) — not the hero terminal. */
 function markNestedScrollAreas() {
@@ -34,32 +23,15 @@ export function initScroll(ctx) {
 
   const { scrollProgress, backToTop } = ctx.dom;
   const scrollApi = { engine: null, scrollTo: null, destroy: () => {} };
-  const useSpringProgress = shouldUseSpringScrollProgress();
 
   hardScrollToTop();
   document.body.classList.remove('nav-open');
   if (scrollProgress) scrollProgress.style.transform = 'scaleX(0)';
   backToTop?.classList.remove('visible');
 
-  const rawProgress = motionValue(0);
-  const smoothProgress = motionValue(0);
-  const stopProgressFollow = useSpringProgress
-    ? attachFollow(smoothProgress, rawProgress, PROGRESS_SPRING)
-    : () => {};
-
   let lastProgressScale = -1;
   let lastBackToTopVisible = null;
-  let stopProgressListener = () => {};
-
-  if (scrollProgress && useSpringProgress) {
-    stopProgressListener = smoothProgress.on('change', (scale) => {
-      const clamped = Math.min(1, Math.max(0, scale));
-      if (Math.abs(clamped - lastProgressScale) > 0.001) {
-        lastProgressScale = clamped;
-        scrollProgress.style.transform = `scaleX(${clamped})`;
-      }
-    });
-  }
+  const unbindScrollVelocity = bindScrollVelocityTracking();
 
   const updateScrollProgress = () => {
     const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
@@ -70,9 +42,7 @@ export function initScroll(ctx) {
     const ratio = limit > 0 ? scrollTop / limit : 0;
     const clamped = Math.min(1, Math.max(0, ratio));
 
-    if (useSpringProgress) {
-      rawProgress.set(clamped);
-    } else if (scrollProgress && Math.abs(clamped - lastProgressScale) > 0.001) {
+    if (scrollProgress && Math.abs(clamped - lastProgressScale) > 0.001) {
       lastProgressScale = clamped;
       scrollProgress.style.transform = `scaleX(${clamped})`;
     }
@@ -111,17 +81,10 @@ export function initScroll(ctx) {
     });
   };
 
-  document.querySelectorAll('.reveal').forEach((el) => {
-    el.classList.add('visible', 'is-revealed');
-  });
-
   const useMotionScroll = shouldEnableMotionSmoothScroll();
 
   markNestedScrollAreas();
-
-  if (!useSpringProgress) {
-    bindScrollChains(['#labOutput', '.nav-drawer-links']);
-  }
+  bindScrollChains(['#labOutput', '.nav-drawer-links']);
 
   if (useMotionScroll) {
     const engine = createMotionSmoothScroll();
@@ -201,8 +164,7 @@ export function initScroll(ctx) {
   scrollApi.destroy = () => {
     window.removeEventListener('pageshow', onPageShow);
     window.removeEventListener('scroll', onScroll);
-    stopProgressFollow();
-    stopProgressListener();
+    unbindScrollVelocity();
     scrollApi.engine?.destroy();
     document.documentElement.classList.remove('motion-smooth-scroll');
     scrollApi.engine = null;
