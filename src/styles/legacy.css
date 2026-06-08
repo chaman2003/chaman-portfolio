@@ -3090,40 +3090,60 @@ main > section {
     scroll-snap-type: none;
   }
 
-  /* Vertical rail on each card (above glass, behind numbered dots) */
+  /* Dark rail on card body, bright rail in gaps — continuous through dots */
   #timeline .timeline-item::before {
     content: '';
     position: absolute;
     left: calc(var(--timeline-pad) + var(--timeline-dot-r));
-    width: var(--timeline-line-h);
+    width: 2px;
     transform: translateX(-50%);
     border-radius: 999px;
     pointer-events: none;
     z-index: 1;
     background: linear-gradient(
       180deg,
-      rgba(124, 248, 255, 0.95) 0%,
-      var(--timeline-line-core) 45%,
-      rgba(79, 163, 255, 0.82) 100%
+      rgba(36, 88, 150, 0.45) 0%,
+      rgba(52, 108, 175, 0.72) 50%,
+      rgba(36, 88, 150, 0.45) 100%
     );
-    box-shadow:
-      0 0 8px var(--timeline-line-glow),
-      0 0 16px rgba(124, 248, 255, 0.22);
   }
 
   #timeline .timeline-item:first-child::before {
     top: calc(var(--timeline-pad) + var(--timeline-dot-r));
-    bottom: calc(var(--timeline-gap) * -0.5);
+    bottom: 0;
   }
 
   #timeline .timeline-item:not(:first-child):not(:last-child)::before {
-    top: calc(var(--timeline-gap) * -0.5);
-    bottom: calc(var(--timeline-gap) * -0.5);
+    top: 0;
+    bottom: 0;
   }
 
   #timeline .timeline-item:last-child::before {
-    top: calc(var(--timeline-gap) * -0.5);
-    height: calc(var(--timeline-gap) * 0.5 + var(--timeline-pad) + var(--timeline-dot-r));
+    top: 0;
+    height: calc(var(--timeline-pad) + var(--timeline-dot-r));
+  }
+
+  #timeline .timeline-item:not(:last-child)::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: calc(var(--timeline-pad) + var(--timeline-dot-r));
+    top: calc(100% - 1px);
+    width: var(--timeline-line-h);
+    height: calc(var(--timeline-gap) + 2px);
+    transform: translateX(-50%);
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 2;
+    background: linear-gradient(
+      180deg,
+      rgba(124, 248, 255, 0.98) 0%,
+      var(--timeline-line-core) 50%,
+      rgba(124, 248, 255, 0.98) 100%
+    );
+    box-shadow:
+      0 0 10px var(--timeline-line-glow),
+      0 0 22px rgba(124, 248, 255, 0.32);
   }
 
   #timeline .timeline-item {
@@ -3161,7 +3181,6 @@ main > section {
     line-height: 1.45;
   }
 
-  #timeline .timeline-item:not(:last-child)::after,
   #timeline .timeline-item:not(:last-child) > span::after,
   #timeline .timeline-item:not(:first-child) > span::before {
     display: none;
