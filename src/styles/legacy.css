@@ -3090,17 +3090,16 @@ main > section {
     scroll-snap-type: none;
   }
 
-  #timeline .timeline::before {
+  /* Vertical rail on each card (above glass, behind numbered dots) */
+  #timeline .timeline-item::before {
     content: '';
     position: absolute;
     left: calc(var(--timeline-pad) + var(--timeline-dot-r));
-    top: calc(var(--timeline-pad) + var(--timeline-dot-r));
-    bottom: calc(var(--timeline-pad) + var(--timeline-dot-r));
     width: var(--timeline-line-h);
     transform: translateX(-50%);
     border-radius: 999px;
     pointer-events: none;
-    z-index: 0;
+    z-index: 1;
     background: linear-gradient(
       180deg,
       rgba(124, 248, 255, 0.95) 0%,
@@ -3110,6 +3109,21 @@ main > section {
     box-shadow:
       0 0 8px var(--timeline-line-glow),
       0 0 16px rgba(124, 248, 255, 0.22);
+  }
+
+  #timeline .timeline-item:first-child::before {
+    top: calc(var(--timeline-pad) + var(--timeline-dot-r));
+    bottom: calc(var(--timeline-gap) * -0.5);
+  }
+
+  #timeline .timeline-item:not(:first-child):not(:last-child)::before {
+    top: calc(var(--timeline-gap) * -0.5);
+    bottom: calc(var(--timeline-gap) * -0.5);
+  }
+
+  #timeline .timeline-item:last-child::before {
+    top: calc(var(--timeline-gap) * -0.5);
+    height: calc(var(--timeline-gap) * 0.5 + var(--timeline-pad) + var(--timeline-dot-r));
   }
 
   #timeline .timeline-item {
@@ -3127,10 +3141,13 @@ main > section {
   #timeline .timeline-item > div {
     flex: 1;
     min-width: 0;
+    position: relative;
+    z-index: 1;
   }
 
   #timeline .timeline-item span {
     margin-top: 0.05rem;
+    z-index: 2;
   }
 
   #timeline .timeline-item h4 {
