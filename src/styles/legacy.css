@@ -26,6 +26,9 @@
   --text-xl: clamp(1.25rem, 3vw, 1.85rem);
   --motion-speed: 1;
   --motion-play-state: running;
+  --back-top-size: clamp(42px, 11vw, 48px);
+  --back-top-gap: 0.65rem;
+  --quick-dock-stack: calc(3.35rem + var(--back-top-gap));
 }
 
 body[data-theme='light'] {
@@ -2057,9 +2060,32 @@ body[data-theme='light'] .repo-card {
   --timeline-gap: 0.75rem;
   --timeline-rail-y: calc(var(--timeline-pad) + var(--timeline-dot-r));
   --timeline-count: 4;
-  --timeline-line-h: 3px;
+  --timeline-rail-card-w: 2px;
+  --timeline-rail-gap-w: 3px;
+  --timeline-line-h: var(--timeline-rail-gap-w);
   --timeline-line-glow: rgba(79, 163, 255, 0.55);
   --timeline-line-core: var(--primary);
+  --timeline-rail-card-h: linear-gradient(
+    90deg,
+    rgba(36, 88, 150, 0.45) 0%,
+    rgba(52, 108, 175, 0.72) 50%,
+    rgba(36, 88, 150, 0.45) 100%
+  );
+  --timeline-rail-card-v: linear-gradient(
+    180deg,
+    rgba(36, 88, 150, 0.45) 0%,
+    rgba(52, 108, 175, 0.72) 50%,
+    rgba(36, 88, 150, 0.45) 100%
+  );
+  --timeline-rail-card: var(--timeline-rail-card-h);
+  --timeline-rail-gap: linear-gradient(
+    90deg,
+    rgba(79, 163, 255, 0.35),
+    var(--timeline-line-core) 45%,
+    #7cf8ff 55%,
+    rgba(124, 248, 255, 0.35)
+  );
+  --timeline-rail-gap-glow: 0 0 10px var(--timeline-line-glow), 0 0 22px rgba(124, 248, 255, 0.32);
 
   display: flex;
   flex-direction: row;
@@ -2100,50 +2126,36 @@ body[data-theme='light'] .repo-card {
   z-index: 1;
 }
 
-/* Neon bridge across the flex gap only — never crosses card bodies */
+/* Bright neon bridge in flex gap between cards */
 .timeline-item:not(:last-child)::after {
   content: '';
   position: absolute;
   top: var(--timeline-rail-y);
   left: 100%;
   width: var(--timeline-gap);
-  height: var(--timeline-line-h);
+  height: var(--timeline-rail-gap-w);
   transform: translateY(-50%);
   border-radius: 999px;
   pointer-events: none;
   z-index: 2;
-  background: linear-gradient(
-    90deg,
-    rgba(79, 163, 255, 0.35),
-    var(--timeline-line-core) 45%,
-    #7cf8ff 55%,
-    rgba(124, 248, 255, 0.35)
-  );
+  background: var(--timeline-rail-gap);
   background-size: 220% 100%;
   animation: timeline-flow 3.6s linear infinite;
-  box-shadow:
-    0 0 8px var(--timeline-line-glow),
-    0 0 18px rgba(124, 248, 255, 0.28);
+  box-shadow: var(--timeline-rail-gap-glow);
 }
 
-/* Dot → card edge (top rail only, behind card copy) */
+/* Dark rail arms on card body (dot → card edge) */
 .timeline-item:not(:last-child) > span::after,
 .timeline-item:not(:first-child) > span::before {
   content: '';
   position: absolute;
   top: 50%;
-  height: var(--timeline-line-h);
+  height: var(--timeline-rail-card-w);
   transform: translateY(-50%);
   border-radius: 999px;
   pointer-events: none;
   z-index: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(79, 163, 255, 0.18),
-    rgba(79, 163, 255, 0.55) 50%,
-    rgba(124, 248, 255, 0.18)
-  );
-  box-shadow: 0 0 6px rgba(79, 163, 255, 0.22);
+  background: var(--timeline-rail-card);
 }
 
 .timeline-item:not(:last-child) > span::after {
@@ -2198,15 +2210,53 @@ body[data-motion='off'] .timeline-item:not(:last-child)::after {
 
 .quick-dock {
   position: fixed;
-  right: 14px;
-  bottom: 14px;
+  right: max(14px, env(safe-area-inset-right, 0px));
+  bottom: max(14px, env(safe-area-inset-bottom, 0px));
   z-index: 50;
   border-radius: 13px;
   padding: 0.5rem;
   display: flex;
   gap: 0.45rem;
   flex-wrap: wrap;
-  max-width: 320px;
+  max-width: min(320px, calc(100vw - 2rem));
+}
+
+.back-to-top {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right, 0px));
+  bottom: calc(max(14px, env(safe-area-inset-bottom, 0px)) + var(--quick-dock-stack));
+  z-index: 65;
+  width: var(--back-top-size);
+  height: var(--back-top-size);
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text);
+  font-size: clamp(1rem, 2.8vw, 1.15rem);
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+  box-shadow: 0 8px 24px rgba(2, 9, 23, 0.35);
+}
+
+.back-to-top:hover {
+  border-color: rgba(124, 168, 255, 0.52);
+  background: rgba(79, 163, 255, 0.16);
+}
+
+.back-to-top:active {
+  transform: translateY(0) scale(0.96);
 }
 .quick-dock a {
   display: inline-flex;
@@ -2233,31 +2283,14 @@ body[data-motion='off'] .timeline-item:not(:last-child)::after {
   background: rgba(79, 163, 255, 0.16);
 }
 
-.back-to-top {
-  position: fixed;
-  right: 16px;
-  bottom: 84px;
-  z-index: 58;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--surface-soft);
-  color: var(--text);
-  font-size: 1.05rem;
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(8px);
-  transition:
-    opacity 0.22s ease,
-    transform 0.22s ease;
-}
-
 .back-to-top.visible {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
+}
+
+.back-to-top.visible:active {
+  transform: translateY(0) scale(0.96);
 }
 
 a:focus-visible,
@@ -2936,8 +2969,9 @@ main > section {
   }
 
   .back-to-top {
+    --quick-dock-stack: 0px;
     right: max(12px, env(safe-area-inset-right, 0px));
-    bottom: max(88px, calc(16px + env(safe-area-inset-bottom, 0px)));
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -3070,6 +3104,12 @@ main > section {
   }
 }
 
+@media (min-width: 1024px) {
+  .back-to-top {
+    --quick-dock-stack: calc(4.1rem + var(--back-top-gap));
+  }
+}
+
 /* Builder Timeline — vertical stack on phones/tablets */
 @media (max-width: 767px) {
   #timeline.panel {
@@ -3079,6 +3119,13 @@ main > section {
   #timeline .timeline {
     --timeline-dot: 32px;
     --timeline-gap: 0.65rem;
+    --timeline-rail-card: var(--timeline-rail-card-v);
+    --timeline-rail-gap: linear-gradient(
+      180deg,
+      rgba(124, 248, 255, 0.98) 0%,
+      var(--timeline-line-core) 50%,
+      rgba(124, 248, 255, 0.98) 100%
+    );
 
     flex-direction: column;
     align-items: stretch;
@@ -3090,60 +3137,51 @@ main > section {
     scroll-snap-type: none;
   }
 
-  /* Dark rail on card body, bright rail in gaps — continuous through dots */
+  /* Dark rail on card body */
   #timeline .timeline-item::before {
     content: '';
     position: absolute;
     left: calc(var(--timeline-pad) + var(--timeline-dot-r));
-    width: 2px;
+    width: var(--timeline-rail-card-w);
     transform: translateX(-50%);
     border-radius: 999px;
     pointer-events: none;
     z-index: 1;
-    background: linear-gradient(
-      180deg,
-      rgba(36, 88, 150, 0.45) 0%,
-      rgba(52, 108, 175, 0.72) 50%,
-      rgba(36, 88, 150, 0.45) 100%
-    );
+    background: var(--timeline-rail-card);
   }
 
   #timeline .timeline-item:first-child::before {
     top: calc(var(--timeline-pad) + var(--timeline-dot-r));
-    bottom: 0;
+    bottom: -1px;
   }
 
   #timeline .timeline-item:not(:first-child):not(:last-child)::before {
-    top: 0;
-    bottom: 0;
+    top: -1px;
+    bottom: -1px;
   }
 
   #timeline .timeline-item:last-child::before {
-    top: 0;
-    height: calc(var(--timeline-pad) + var(--timeline-dot-r));
+    top: -1px;
+    height: calc(var(--timeline-pad) + var(--timeline-dot-r) + 1px);
   }
 
+  /* Bright neon bridge in gap between cards */
   #timeline .timeline-item:not(:last-child)::after {
     content: '';
     display: block;
     position: absolute;
     left: calc(var(--timeline-pad) + var(--timeline-dot-r));
     top: calc(100% - 1px);
-    width: var(--timeline-line-h);
+    width: var(--timeline-rail-gap-w);
     height: calc(var(--timeline-gap) + 2px);
     transform: translateX(-50%);
     border-radius: 999px;
     pointer-events: none;
     z-index: 2;
-    background: linear-gradient(
-      180deg,
-      rgba(124, 248, 255, 0.98) 0%,
-      var(--timeline-line-core) 50%,
-      rgba(124, 248, 255, 0.98) 100%
-    );
-    box-shadow:
-      0 0 10px var(--timeline-line-glow),
-      0 0 22px rgba(124, 248, 255, 0.32);
+    background: var(--timeline-rail-gap);
+    background-size: 220% 100%;
+    animation: timeline-flow 3.6s linear infinite;
+    box-shadow: var(--timeline-rail-gap-glow);
   }
 
   #timeline .timeline-item {
@@ -3307,6 +3345,11 @@ main > section {
   .timeline {
     --timeline-pad: 0.68rem;
     --timeline-dot: 30px;
+  }
+
+  .back-to-top {
+    right: max(10px, env(safe-area-inset-right, 0px));
+    bottom: max(10px, env(safe-area-inset-bottom, 0px));
   }
 
   #timeline .timeline-item h4 {
